@@ -36,10 +36,12 @@ public class FeedbackController {
 
     // Get All Feedback
     @GetMapping
-    public ResponseEntity<List<FeedbackResponse>> getAllFeedback() {
+    public ResponseEntity<List<FeedbackResponse>> getAllFeedback(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Integer rating) {
 
         return ResponseEntity.ok(
-                feedbackService.getAllFeedback());
+                feedbackService.getAllFeedback(search, rating));
     }
 
     // Get Feedback By ID

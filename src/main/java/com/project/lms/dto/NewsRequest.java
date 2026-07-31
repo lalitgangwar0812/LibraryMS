@@ -1,7 +1,6 @@
 package com.project.lms.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -19,6 +18,5 @@ public class NewsRequest {
     @NotBlank(message = "Description is required")
     private String description;
 
-    @NotNull(message = "Posted By is required")
-    private Integer postedBy;
+    private Boolean published;
 }

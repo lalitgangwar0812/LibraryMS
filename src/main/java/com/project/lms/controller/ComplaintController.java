@@ -25,7 +25,12 @@ public class ComplaintController {
         this.complaintService = complaintService;
     }
 
-    // Create Complaint
+    /*
+     * =====================================
+     * CREATE COMPLAINT
+     * =====================================
+     */
+
     @PostMapping
     public ResponseEntity<ComplaintResponse> createComplaint(
             @Valid @RequestBody ComplaintRequest request) {
@@ -35,15 +40,42 @@ public class ComplaintController {
                 HttpStatus.CREATED);
     }
 
-    // Get All Complaints
+    /*
+     * =====================================
+     * GET ALL COMPLAINTS
+     * ADMIN / LIBRARIAN
+     * =====================================
+     */
+
     @GetMapping
-    public ResponseEntity<List<ComplaintResponse>> getAllComplaints() {
+    public ResponseEntity<List<ComplaintResponse>> getAllComplaints(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) ComplaintStatus status) {
 
         return ResponseEntity.ok(
-                complaintService.getAllComplaints());
+                complaintService.getAllComplaints(search, status));
     }
 
-    // Get Complaint By ID
+    /*
+     * =====================================
+     * GET MY COMPLAINTS
+     * STUDENT
+     * =====================================
+     */
+
+    @GetMapping("/my")
+    public ResponseEntity<List<ComplaintResponse>> getMyComplaints() {
+
+        return ResponseEntity.ok(
+                complaintService.getMyComplaints());
+    }
+
+    /*
+     * =====================================
+     * GET COMPLAINT BY ID
+     * =====================================
+     */
+
     @GetMapping("/{complaintId}")
     public ResponseEntity<ComplaintResponse> getComplaintById(
             @PathVariable Integer complaintId) {
@@ -52,16 +84,28 @@ public class ComplaintController {
                 complaintService.getComplaintById(complaintId));
     }
 
-    // Get Complaints By User
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ComplaintResponse>> getComplaintsByUser(
-            @PathVariable Integer userId) {
+    /*
+     * =====================================
+     * FILTER BY STATUS
+     * ADMIN / LIBRARIAN
+     * =====================================
+     */
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<ComplaintResponse>> getComplaintsByStatus(
+            @PathVariable ComplaintStatus status) {
 
         return ResponseEntity.ok(
-                complaintService.getComplaintsByUser(userId));
+                complaintService.getComplaintsByStatus(status));
     }
 
-    // Update Complaint Status
+    /*
+     * =====================================
+     * UPDATE STATUS
+     * ADMIN / LIBRARIAN
+     * =====================================
+     */
+
     @PutMapping("/{complaintId}/status")
     public ResponseEntity<ComplaintResponse> updateStatus(
             @PathVariable Integer complaintId,
@@ -69,5 +113,21 @@ public class ComplaintController {
 
         return ResponseEntity.ok(
                 complaintService.updateStatus(complaintId, status));
+    }
+
+    /*
+     * =====================================
+     * DELETE COMPLAINT
+     * ADMIN
+     * =====================================
+     */
+
+    @DeleteMapping("/{complaintId}")
+    public ResponseEntity<Void> deleteComplaint(
+            @PathVariable Integer complaintId) {
+
+        complaintService.deleteComplaint(complaintId);
+
+        return ResponseEntity.noContent().build();
     }
 }

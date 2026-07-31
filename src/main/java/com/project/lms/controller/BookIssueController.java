@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.project.lms.dto.BookIssueRequest;
 import com.project.lms.dto.BookIssueResponse;
+import com.project.lms.dto.StudentResponse;
 import com.project.lms.service.BookIssueService;
 
 import jakarta.validation.Valid;
@@ -29,16 +30,7 @@ public class BookIssueController {
     public ResponseEntity<BookIssueResponse> issueBook(
             @Valid @RequestBody BookIssueRequest request) {
 
-        System.out.println("=================================");
-        System.out.println(">>> Book Issue API Hit <<<");
-        System.out.println("User ID : " + request.getUserId());
-        System.out.println("Book ID : " + request.getBookId());
-        System.out.println("Due Date: " + request.getDueDate());
-        System.out.println("=================================");
-
         BookIssueResponse response = bookIssueService.issueBook(request);
-
-        System.out.println("Book issued successfully.");
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -48,32 +40,34 @@ public class BookIssueController {
     public ResponseEntity<BookIssueResponse> returnBook(
             @PathVariable Integer issueId) {
 
-        System.out.println(">>> Return Book API Hit <<<");
-        System.out.println("Issue ID: " + issueId);
-
         BookIssueResponse response = bookIssueService.returnBook(issueId);
-
-        System.out.println("Book returned successfully.");
 
         return ResponseEntity.ok(response);
     }
 
     // Get All Issued Books
     @GetMapping
-    public ResponseEntity<List<BookIssueResponse>> getAllIssues() {
+    public ResponseEntity<List<BookIssueResponse>> getAllIssues(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status) {
 
-        System.out.println(">>> Get All Issues API Hit <<<");
+        return ResponseEntity.ok(bookIssueService.getAllIssues(search, status));
+    }
 
-        return ResponseEntity.ok(bookIssueService.getAllIssues());
+    @GetMapping("/students")
+    public ResponseEntity<List<StudentResponse>> getIssuableStudents() {
+        return ResponseEntity.ok(bookIssueService.getIssuableStudents());
+    }
+
+    @GetMapping("/students/{studentId}")
+    public ResponseEntity<StudentResponse> getStudentForCirculation(@PathVariable Integer studentId) {
+        return ResponseEntity.ok(bookIssueService.getStudentForCirculation(studentId));
     }
 
     // Get Issue By ID
     @GetMapping("/{issueId}")
     public ResponseEntity<BookIssueResponse> getIssueById(
             @PathVariable Integer issueId) {
-
-        System.out.println(">>> Get Issue By ID API Hit <<<");
-        System.out.println("Issue ID: " + issueId);
 
         return ResponseEntity.ok(bookIssueService.getIssueById(issueId));
     }
@@ -83,19 +77,19 @@ public class BookIssueController {
     public ResponseEntity<List<BookIssueResponse>> getIssuesByUser(
             @PathVariable Integer userId) {
 
-        System.out.println(">>> Get Issues By User API Hit <<<");
-        System.out.println("User ID: " + userId);
-
         return ResponseEntity.ok(bookIssueService.getIssuesByUser(userId));
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<BookIssueResponse>> getIssuesForCurrentUser() {
+
+        return ResponseEntity.ok(bookIssueService.getIssuesForCurrentUser());
     }
 
     // Get Issues By Book
     @GetMapping("/book/{bookId}")
     public ResponseEntity<List<BookIssueResponse>> getIssuesByBook(
             @PathVariable Integer bookId) {
-
-        System.out.println(">>> Get Issues By Book API Hit <<<");
-        System.out.println("Book ID: " + bookId);
 
         return ResponseEntity.ok(bookIssueService.getIssuesByBook(bookId));
     }

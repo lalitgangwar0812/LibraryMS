@@ -22,4 +22,6 @@ public class NewsResponse {
     private String postedByName;
 
     private LocalDateTime createdAt;
+
+    private boolean published;
 }

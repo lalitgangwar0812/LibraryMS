@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.project.lms.dto.BookRequest;
 import com.project.lms.dto.BookResponse;
+import com.project.lms.dto.CategoryResponse;
+import com.project.lms.service.CategoryService;
 import com.project.lms.service.BookService;
 
 import jakarta.validation.Valid;
@@ -19,9 +21,11 @@ import jakarta.validation.Valid;
 public class BookController {
 
     private final BookService bookService;
+    private final CategoryService categoryService;
 
-    public BookController(BookService bookService) {
+    public BookController(BookService bookService, CategoryService categoryService) {
         this.bookService = bookService;
+        this.categoryService = categoryService;
     }
 
     // Create Book
@@ -39,6 +43,12 @@ public class BookController {
     public ResponseEntity<List<BookResponse>> getAllBooks() {
 
         return ResponseEntity.ok(bookService.getAllBooks());
+    }
+
+    // Categories are exposed here only as catalog metadata for book creation and editing.
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategoryResponse>> getBookCategories() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
     // Get Book By ID

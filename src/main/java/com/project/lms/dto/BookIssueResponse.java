@@ -28,4 +28,6 @@ public class BookIssueResponse {
     private LocalDate returnDate;
 
     private String status;
+
+    private boolean overdue;
 }

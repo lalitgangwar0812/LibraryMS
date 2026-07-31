@@ -41,6 +41,17 @@ public class Book {
     @Column(name = "shelf_no", nullable = false, length = 20)
     private String shelfNo;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Version
+    @Column(name = "lock_version", nullable = false)
+    private Long lockVersion;
+
+    @PrePersist
+    void prePersist() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

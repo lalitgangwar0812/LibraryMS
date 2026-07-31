@@ -8,17 +8,21 @@ import org.springframework.stereotype.Service;
 import com.project.lms.dto.CategoryRequest;
 import com.project.lms.dto.CategoryResponse;
 import com.project.lms.entity.Category;
+import com.project.lms.exception.BadRequestException;
 import com.project.lms.exception.DuplicateResourceException;
 import com.project.lms.exception.ResourceNotFoundException;
+import com.project.lms.repository.BookRepository;
 import com.project.lms.repository.CategoryRepository;
 
 @Service
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final BookRepository bookRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, BookRepository bookRepository) {
         this.categoryRepository = categoryRepository;
+        this.bookRepository = bookRepository;
     }
 
     // Create Category
@@ -82,6 +86,10 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Category not found with id: " + id));
+
+        if (!bookRepository.findByCategory_CategoryId(id).isEmpty()) {
+            throw new BadRequestException("Cannot delete category because books exist in this category");
+        }
 
         categoryRepository.delete(category);
 

@@ -46,8 +46,20 @@ public class FeedbackService {
 
     // Get All Feedback
     public List<FeedbackResponse> getAllFeedback() {
+        return getAllFeedback(null, null);
+    }
 
-        return feedbackRepository.findAllByOrderByCreatedAtDesc()
+    public List<FeedbackResponse> getAllFeedback(
+            String search,
+            Integer rating) {
+
+        String normalizedSearch = (search == null || search.isBlank())
+                ? null
+                : search.trim();
+
+        return feedbackRepository.searchByRatingAndSearch(
+                        rating,
+                        normalizedSearch)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

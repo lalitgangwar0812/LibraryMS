@@ -1,0 +1,251 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Eye, Search, Filter, MessageSquare, AlertTriangle } from 'lucide-react'
+import AdminLayout from '../../../components/layout/AdminLayout'
+import SectionHeader from '../../../components/layout/SectionHeader'
+import { Button } from '../../../components/ui/button'
+import api from '../../../components/common/api'
+
+const statusOptions = [
+  { value: '', label: 'All statuses' },
+  { value: 'PENDING', label: 'Pending' },
+  { value: 'IN_PROGRESS', label: 'In progress' },
+  { value: 'RESOLVED', label: 'Resolved' },
+]
+
+const statusStyles = {
+  PENDING: 'bg-amber-100 text-amber-700',
+  IN_PROGRESS: 'bg-sky-100 text-sky-700',
+  RESOLVED: 'bg-emerald-100 text-emerald-700',
+}
+
+function ComplaintsPage() {
+  const [complaints, setComplaints] = useState([])
+  const [search, setSearch] = useState('')
+  const [status, setStatus] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [selectedComplaint, setSelectedComplaint] = useState(null)
+  const [updatedStatus, setUpdatedStatus] = useState('')
+  const [savingStatus, setSavingStatus] = useState(false)
+
+  const fetchComplaints = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      const response = await api.get('/complaints', {
+        params: {
+          search: search || undefined,
+          status: status || undefined,
+        },
+      })
+      setComplaints(response.data)
+    } catch (requestError) {
+      setError(requestError?.response?.data?.message || 'Unable to load complaints.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const debounce = setTimeout(fetchComplaints, 250)
+    return () => clearTimeout(debounce)
+  }, [search, status])
+
+  const selectedStatusLabel = (value) => statusOptions.find((option) => option.value === value)?.label || value
+
+  const openComplaint = (complaint) => {
+    setSelectedComplaint(complaint)
+    setUpdatedStatus(complaint.status)
+  }
+
+  const closeComplaint = () => {
+    setSelectedComplaint(null)
+    setUpdatedStatus('')
+    setSavingStatus(false)
+  }
+
+  const updateComplaintStatus = async () => {
+    if (!selectedComplaint || !updatedStatus) return
+
+    try {
+      setSavingStatus(true)
+      await api.put(`/complaints/${selectedComplaint.complaintId}/status`, null, {
+        params: { status: updatedStatus },
+      })
+      setSuccess('Complaint status updated successfully.')
+      await fetchComplaints()
+      const refreshed = complaints.find((item) => item.complaintId === selectedComplaint.complaintId)
+      if (refreshed) {
+        setSelectedComplaint({ ...refreshed, status: updatedStatus })
+      }
+    } catch (requestError) {
+      setError(requestError?.response?.data?.message || 'Unable to update complaint status.')
+    } finally {
+      setSavingStatus(false)
+    }
+  }
+
+  const complaintCount = complaints.length
+
+  const complaintRows = useMemo(() => complaints, [complaints])
+
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <SectionHeader
+            title="Complaints"
+            description="Review and manage library complaints from students."
+          />
+
+          {success ? (
+            <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+              {success}
+            </div>
+          ) : null}
+
+          {error ? (
+            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          ) : null}
+
+          <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="relative flex-1 lg:max-w-md">
+              <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-sky-500"
+                placeholder="Search subject or student name"
+              />
+            </div>
+            <select
+              value={status}
+              onChange={(event) => setStatus(event.target.value)}
+              className="w-full max-w-xs rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none focus:border-sky-500"
+            >
+              {statusOptions.map((item) => (
+                <option key={item.value} value={item.value}>{item.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mt-6 overflow-x-auto rounded-2xl border border-slate-200">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-slate-50 text-slate-600">
+                <tr>
+                  <th className="px-4 py-3">Student</th>
+                  <th className="px-4 py-3">Subject</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Created</th>
+                  <th className="px-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="px-4 py-10 text-center text-slate-500">
+                      Loading complaints...
+                    </td>
+                  </tr>
+                ) : complaintRows.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="px-4 py-10 text-center text-slate-500">
+                      No complaints found.
+                    </td>
+                  </tr>
+                ) : (
+                  complaintRows.map((complaint) => (
+                    <tr key={complaint.complaintId} className="border-t border-slate-200 hover:bg-slate-50">
+                      <td className="px-4 py-3 font-medium text-slate-900">{complaint.userName}</td>
+                      <td className="px-4 py-3 text-slate-600">{complaint.subject}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${statusStyles[complaint.status] || 'bg-slate-100 text-slate-700'}`}>
+                          {selectedStatusLabel(complaint.status)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">{complaint.createdAt?.replace('T', ' ')}</td>
+                      <td className="px-4 py-3">
+                        <Button variant="outline" size="sm" onClick={() => openComplaint(complaint)}>
+                          <Eye size={14} /> View
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-4 text-sm text-slate-500">Showing {complaintCount} complaint{complaintCount === 1 ? '' : 's'}.</div>
+        </div>
+      </div>
+
+      {selectedComplaint ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 px-4 py-8">
+          <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">
+                  <MessageSquare size={16} /> Complaint details
+                </div>
+                <h2 className="mt-3 text-2xl font-semibold text-slate-900">{selectedComplaint.subject}</h2>
+                <p className="mt-1 text-sm text-slate-600">Submitted by {selectedComplaint.userName} on {selectedComplaint.createdAt?.replace('T', ' ')}</p>
+              </div>
+              <button className="text-sm text-slate-500" onClick={closeComplaint}>Close</button>
+            </div>
+
+            <div className="mt-6 grid gap-4 lg:grid-cols-2">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                <p className="text-sm font-medium text-slate-600">Current status</p>
+                <p className="mt-2 text-lg font-semibold text-slate-900">{selectedStatusLabel(selectedComplaint.status)}</p>
+              </div>
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                <p className="text-sm font-medium text-slate-600">Update status</p>
+                <select
+                  value={updatedStatus}
+                  onChange={(event) => setUpdatedStatus(event.target.value)}
+                  className="mt-3 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-sky-500"
+                >
+                  <option value="">Select status</option>
+                  {statusOptions.filter((item) => item.value).map((item) => (
+                    <option key={item.value} value={item.value}>{item.label}</option>
+                  ))}
+                </select>
+                <div className="mt-4 flex items-center gap-3">
+                  <Button
+                    onClick={updateComplaintStatus}
+                    disabled={savingStatus || !updatedStatus || updatedStatus === selectedComplaint.status}
+                  >
+                    {savingStatus ? 'Saving...' : 'Save status'}
+                  </Button>
+                  <Button variant="outline" onClick={closeComplaint}>Cancel</Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-3xl border border-slate-200 bg-slate-50 p-5">
+              <p className="text-sm font-medium text-slate-600">Description</p>
+              <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-700">{selectedComplaint.description}</p>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                <p className="text-sm font-medium text-slate-600">Complaint ID</p>
+                <p className="mt-2 text-sm text-slate-900">#{selectedComplaint.complaintId}</p>
+              </div>
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                <p className="text-sm font-medium text-slate-600">Student</p>
+                <p className="mt-2 text-sm text-slate-900">{selectedComplaint.userName}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </AdminLayout>
+  )
+}
+
+export default ComplaintsPage

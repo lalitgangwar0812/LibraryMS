@@ -3,13 +3,17 @@ package com.project.lms.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.project.lms.dto.ComplaintRequest;
 import com.project.lms.dto.ComplaintResponse;
 import com.project.lms.entity.Complaint;
 import com.project.lms.entity.ComplaintStatus;
+import com.project.lms.entity.Role;
 import com.project.lms.entity.User;
+import com.project.lms.exception.BadRequestException;
 import com.project.lms.exception.ResourceNotFoundException;
 import com.project.lms.repository.ComplaintRepository;
 import com.project.lms.repository.UserRepository;
@@ -20,64 +24,155 @@ public class ComplaintService {
     private final ComplaintRepository complaintRepository;
     private final UserRepository userRepository;
 
-    public ComplaintService(ComplaintRepository complaintRepository,
-                            UserRepository userRepository) {
+    public ComplaintService(
+            ComplaintRepository complaintRepository,
+            UserRepository userRepository) {
 
         this.complaintRepository = complaintRepository;
         this.userRepository = userRepository;
     }
 
-    // Create Complaint
+    /*
+     * =====================================
+     * CREATE COMPLAINT
+     * =====================================
+     */
+
     public ComplaintResponse createComplaint(ComplaintRequest request) {
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
+        User currentUser = resolveCurrentUser();
+
+        if (currentUser.getRole() != Role.STUDENT) {
+            throw new BadRequestException(
+                    "Only students can raise complaints");
+        }
 
         Complaint complaint = Complaint.builder()
-                .user(user)
-                .subject(request.getSubject())
-                .description(request.getDescription())
+                .user(currentUser)
+                .subject(request.getSubject().trim())
+                .description(request.getDescription().trim())
                 .status(ComplaintStatus.PENDING)
                 .build();
 
-        Complaint savedComplaint = complaintRepository.save(complaint);
+        Complaint savedComplaint =
+                complaintRepository.save(complaint);
 
         return mapToResponse(savedComplaint);
     }
 
-    // Get All Complaints
-    public List<ComplaintResponse> getAllComplaints() {
+    /*
+     * =====================================
+     * GET ALL COMPLAINTS (ADMIN)
+     * =====================================
+     */
 
-        return complaintRepository.findAll()
+    public List<ComplaintResponse> getAllComplaints() {
+        return getAllComplaints(null, null);
+    }
+
+    public List<ComplaintResponse> getAllComplaints(
+            String search,
+            ComplaintStatus status) {
+
+        User currentUser = resolveCurrentUser();
+
+        if (currentUser.getRole() == Role.STUDENT) {
+            throw new BadRequestException(
+                    "Students cannot access all complaints");
+        }
+
+        String normalizedSearch = (search == null || search.isBlank())
+                ? null
+                : search.trim();
+
+        return complaintRepository.searchByStatusAndSearch(
+                        status,
+                        normalizedSearch)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
-    // Get Complaint By ID
-    public ComplaintResponse getComplaintById(Integer id) {
+    /*
+     * =====================================
+     * GET MY COMPLAINTS
+     * =====================================
+     */
 
-        Complaint complaint = complaintRepository.findById(id)
+    public List<ComplaintResponse> getMyComplaints() {
+
+        User currentUser = resolveCurrentUser();
+
+        return complaintRepository
+                .findByUser_Id(currentUser.getId())
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    /*
+     * =====================================
+     * GET COMPLAINT BY ID
+     * =====================================
+     */
+
+    public ComplaintResponse getComplaintById(Integer complaintId) {
+
+        Complaint complaint = complaintRepository.findById(complaintId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Complaint not found"));
+                        new ResourceNotFoundException(
+                                "Complaint not found"));
+
+        User currentUser = resolveCurrentUser();
+
+        if (currentUser.getRole() == Role.STUDENT &&
+                !complaint.getUser().getId().equals(currentUser.getId())) {
+
+            throw new BadRequestException(
+                    "You cannot access this complaint");
+        }
 
         return mapToResponse(complaint);
     }
 
-    // Get Complaints By User
-    public List<ComplaintResponse> getComplaintsByUser(Integer userId) {
+    /*
+     * =====================================
+     * GET COMPLAINTS BY STATUS
+     * =====================================
+     */
 
-        return complaintRepository.findByUser_Id(userId)
+    public List<ComplaintResponse> getComplaintsByStatus(
+            ComplaintStatus status) {
+
+        User currentUser = resolveCurrentUser();
+
+        if (currentUser.getRole() == Role.STUDENT) {
+            throw new BadRequestException(
+                    "Students cannot filter all complaints");
+        }
+
+        return complaintRepository.findByStatus(status)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
-    // Update Complaint Status
+        /*
+     * =====================================
+     * UPDATE COMPLAINT STATUS
+     * =====================================
+     */
+
     public ComplaintResponse updateStatus(
             Integer complaintId,
             ComplaintStatus status) {
+
+        User currentUser = resolveCurrentUser();
+
+        if (currentUser.getRole() == Role.STUDENT) {
+            throw new BadRequestException(
+                    "Students cannot update complaint status");
+        }
 
         Complaint complaint = complaintRepository.findById(complaintId)
                 .orElseThrow(() ->
@@ -90,7 +185,56 @@ public class ComplaintService {
         return mapToResponse(updatedComplaint);
     }
 
-    // Entity -> DTO
+    /*
+     * =====================================
+     * DELETE COMPLAINT
+     * =====================================
+     */
+
+    public void deleteComplaint(Integer complaintId) {
+
+        User currentUser = resolveCurrentUser();
+
+        if (currentUser.getRole() != Role.ADMIN) {
+            throw new BadRequestException(
+                    "Only admin can delete complaints");
+        }
+
+        Complaint complaint = complaintRepository.findById(complaintId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Complaint not found"));
+
+        complaintRepository.delete(complaint);
+    }
+
+    /*
+     * =====================================
+     * GET CURRENT LOGGED-IN USER
+     * =====================================
+     */
+
+    private User resolveCurrentUser() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BadRequestException("Authentication required");
+        }
+
+        String email = authentication.getName();
+
+        return userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
+    }
+
+    /*
+     * =====================================
+     * ENTITY -> DTO
+     * =====================================
+     */
+
     private ComplaintResponse mapToResponse(Complaint complaint) {
 
         return ComplaintResponse.builder()

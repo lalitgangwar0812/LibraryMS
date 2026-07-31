@@ -4,13 +4,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.lms.dto.BookRequest;
 import com.project.lms.dto.BookResponse;
 import com.project.lms.entity.Book;
 import com.project.lms.entity.Category;
 import com.project.lms.exception.DuplicateResourceException;
+import com.project.lms.exception.BadRequestException;
 import com.project.lms.exception.ResourceNotFoundException;
+import com.project.lms.repository.BookIssueRepository;
 import com.project.lms.repository.BookRepository;
 import com.project.lms.repository.CategoryRepository;
 
@@ -19,12 +22,15 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
+    private final BookIssueRepository bookIssueRepository;
 
     public BookService(BookRepository bookRepository,
-                       CategoryRepository categoryRepository) {
+                       CategoryRepository categoryRepository,
+                       BookIssueRepository bookIssueRepository) {
 
         this.bookRepository = bookRepository;
         this.categoryRepository = categoryRepository;
+        this.bookIssueRepository = bookIssueRepository;
     }
 
     // Create Book
@@ -73,6 +79,7 @@ public class BookService {
     }
 
     // Update Book
+    @Transactional
     public BookResponse updateBook(Integer id, BookRequest request) {
 
         Book book = bookRepository.findById(id)
@@ -92,6 +99,10 @@ public class BookService {
         int borrowedBooks =
                 book.getQuantity() - book.getAvailableQuantity();
 
+        if (request.getQuantity() < borrowedBooks) {
+            throw new BadRequestException("Quantity cannot be lower than the number of issued copies");
+        }
+
         book.setTitle(request.getTitle());
         book.setAuthor(request.getAuthor());
         book.setIsbn(request.getIsbn());
@@ -106,11 +117,16 @@ public class BookService {
     }
 
     // Delete Book
+    @Transactional
     public String deleteBook(Integer id) {
 
         Book book = bookRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Book not found"));
+
+        if (bookIssueRepository.existsByBook_BookId(id)) {
+            throw new BadRequestException("Cannot delete book because issue history exists");
+        }
 
         bookRepository.delete(book);
 

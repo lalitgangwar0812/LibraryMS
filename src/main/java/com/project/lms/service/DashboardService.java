@@ -2,6 +2,8 @@ package com.project.lms.service;
 
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 import com.project.lms.dto.DashboardResponse;
 import com.project.lms.entity.ComplaintStatus;
 import com.project.lms.entity.EnquiryStatus;
@@ -61,18 +63,26 @@ public class DashboardService {
                 // Library
                 .totalCategories(categoryRepository.count())
                 .totalBooks(bookRepository.count())
+                .availableBooks(bookRepository.sumAvailableQuantity())
 
                 // Book Issues
                 .totalIssuedBooks(bookIssueRepository.countByStatus(IssueStatus.ISSUED))
                 .totalReturnedBooks(bookIssueRepository.countByStatus(IssueStatus.RETURNED))
+                .overdueBooks(bookIssueRepository.countByStatusAndDueDateBefore(
+                        IssueStatus.ISSUED, LocalDate.now()))
+                .booksIssuedToday(bookIssueRepository.countByIssueDate(LocalDate.now()))
+                .booksReturnedToday(bookIssueRepository.countByReturnDate(LocalDate.now()))
 
                 // Complaints
                 .totalComplaints(complaintRepository.count())
                 .pendingComplaints(
                         complaintRepository.countByStatus(ComplaintStatus.PENDING))
+                .resolvedComplaints(
+                        complaintRepository.countByStatus(ComplaintStatus.RESOLVED))
 
                 // Feedback
                 .totalFeedback(feedbackRepository.count())
+                .averageFeedbackRating(feedbackRepository.averageRating())
 
                 // News
                 .totalNews(newsRepository.count())

@@ -32,6 +32,10 @@ public class News {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "published", nullable = false)
+    @Builder.Default
+    private boolean published = true;
+
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();

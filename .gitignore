@@ -1,10 +1,23 @@
+# =========================
+# General
+# =========================
 HELP.md
+*.log
+.DS_Store
+Thumbs.db
+
+# =========================
+# Maven / Java
+# =========================
 target/
 .mvn/wrapper/maven-wrapper.jar
+
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+# =========================
+# Spring Tool Suite (STS)
+# =========================
 .apt_generated
 .classpath
 .factorypath
@@ -13,21 +26,57 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# =========================
+# NetBeans
+# =========================
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 build/
+
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# =========================
+# VS Code
+# =========================
 .vscode/
+
+# =========================
+# Continue Extension
+# =========================
+.continue/
+
+# =========================
+# Frontend (React + Vite)
+# =========================
+frontend/node_modules/
+frontend/dist/
+
+# Package manager logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Environment files
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# =========================
+# OS Files
+# =========================
+Desktop.ini
