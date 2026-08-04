@@ -5,6 +5,7 @@ import AdminLayout from '../../../components/layout/AdminLayout'
 import SectionHeader from '../../../components/layout/SectionHeader'
 import { Button } from '../../../components/ui/button'
 import api from '../../../components/common/api'
+import { PAGE_SIZE } from '../../../constants/pagination'
 
 const emptyForm = { fullName: '', email: '', phoneNumber: '', password: '', confirmPassword: '' }
 const messageFor = (error, fallback) => error?.response?.data?.message || fallback
@@ -31,7 +32,7 @@ function LibrariansPage() {
     try {
       setLoading(true)
       setError('')
-      const response = await api.get('/admin/librarians', { params: { search: search || undefined, page, size: 8 } })
+      const response = await api.get('/admin/librarians', { params: { search: search || undefined, page, size: PAGE_SIZE } })
       setLibrarians(response.data.content || [])
       setTotalPages(Math.max(response.data.totalPages || 1, 1))
       setTotalElements(response.data.totalElements || 0)
@@ -76,6 +77,7 @@ function LibrariansPage() {
 
   const validate = () => {
     if (!formData.fullName.trim() || !formData.email.trim() || !formData.phoneNumber.trim()) return 'Name, email, and phone number are required.'
+    if (!/^\d{10}$/.test(formData.phoneNumber.trim())) return 'Phone number must contain exactly 10 digits.'
     if (!editingLibrarian && !formData.password) return 'Password is required.'
     if (formData.password && formData.password.length < 8) return 'Password must be at least 8 characters.'
     if (formData.password !== formData.confirmPassword) return 'Passwords do not match.'

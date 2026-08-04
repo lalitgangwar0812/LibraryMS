@@ -21,7 +21,7 @@ function StudentBooksPage() {
         setLoading(true)
         const [booksResponse, categoriesResponse] = await Promise.all([
           api.get('/books'),
-          api.get('/categories'),
+          api.get('/books/categories'),
         ])
 
         setBooks(booksResponse.data || [])

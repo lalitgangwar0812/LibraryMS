@@ -80,10 +80,23 @@ public class SecurityConfig {
                         .hasRole("STUDENT")
                         .requestMatchers("/api/book-issues/my")
                         .hasRole("STUDENT")
+                        // Students can browse books
+                        .requestMatchers(HttpMethod.GET, "/api/books/**")
+                        .hasAnyRole("ADMIN", "LIBRARIAN", "STUDENT")
+
+                        // Only Admin and Librarian can modify books
+                        .requestMatchers("/api/book-issues/**", "/api/dashboard/**")
+                        .hasAnyRole("ADMIN", "LIBRARIAN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/books/**")
+                        .hasAnyRole("ADMIN", "LIBRARIAN")
+
+                        .requestMatchers(HttpMethod.PUT, "/api/books/**")
+                        .hasAnyRole("ADMIN", "LIBRARIAN")
+
                         .requestMatchers(HttpMethod.DELETE, "/api/books/**")
                         .hasRole("ADMIN")
-                        .requestMatchers("/api/book-issues/**", "/api/books/**", "/api/dashboard/**")
-                        .hasAnyRole("ADMIN", "LIBRARIAN")
+
                         .requestMatchers("/api/news", "/api/news/search")
                         .hasAnyRole("ADMIN", "STUDENT", "LIBRARIAN")
                         .requestMatchers("/api/complaints/**", "/api/feedback/**", "/api/news/**", "/api/enquiries/**")

@@ -4,8 +4,7 @@ import AdminLayout from '../../../components/layout/AdminLayout'
 import SectionHeader from '../../../components/layout/SectionHeader'
 import { Button } from '../../../components/ui/button'
 import api from '../../../components/common/api'
-
-const PAGE_SIZE = 8
+import { PAGE_SIZE } from '../../../constants/pagination'
 
 const tomorrow = () => {
   const date = new Date()

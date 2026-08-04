@@ -123,9 +123,9 @@ public class AuthService {
 
         return ProfileResponse.builder()
                 .userId(savedUser.getId())
-                .fullName(savedUser.getFullName())
+                .fullName(request.getFullName())
                 .email(savedUser.getEmail())
-                .phoneNumber(savedUser.getPhoneNumber())
+                .phoneNumber(request.getPhoneNumber())
                 .role(savedUser.getRole().name())
                 .build();
     }

@@ -21,6 +21,7 @@ public class ProfileUpdateRequest {
     private String fullName;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^[0-9+()\\- ]{7,15}$", message = "Phone number is invalid")
+    @Pattern(regexp = "^[0-9]{10}$",
+            message = "Phone number must contain exactly 10 digits")
     private String phoneNumber;
 }

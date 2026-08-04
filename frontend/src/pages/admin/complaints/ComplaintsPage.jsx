@@ -4,6 +4,7 @@ import AdminLayout from '../../../components/layout/AdminLayout'
 import SectionHeader from '../../../components/layout/SectionHeader'
 import { Button } from '../../../components/ui/button'
 import api from '../../../components/common/api'
+import { PAGE_SIZE } from '../../../constants/pagination'
 
 const statusOptions = [
   { value: '', label: 'All statuses' },
@@ -28,6 +29,7 @@ function ComplaintsPage() {
   const [selectedComplaint, setSelectedComplaint] = useState(null)
   const [updatedStatus, setUpdatedStatus] = useState('')
   const [savingStatus, setSavingStatus] = useState(false)
+  const [page, setPage] = useState(1)
 
   const fetchComplaints = async () => {
     try {
@@ -88,7 +90,12 @@ function ComplaintsPage() {
 
   const complaintCount = complaints.length
 
-  const complaintRows = useMemo(() => complaints, [complaints])
+  const totalPages = Math.max(1, Math.ceil(complaintCount / PAGE_SIZE))
+  const complaintRows = useMemo(() => complaints.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [complaints, page])
+
+  useEffect(() => {
+    setPage(1)
+  }, [search, status])
 
   return (
     <AdminLayout>
@@ -179,7 +186,7 @@ function ComplaintsPage() {
             </table>
           </div>
 
-          <div className="mt-4 text-sm text-slate-500">Showing {complaintCount} complaint{complaintCount === 1 ? '' : 's'}.</div>
+          <div className="mt-4 flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between"><span>Showing {complaintRows.length} of {complaintCount} complaint{complaintCount === 1 ? '' : 's'}.</span><div className="flex items-center gap-2"><Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((value) => value - 1)}>Previous</Button><span>Page {page} of {totalPages}</span><Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage((value) => value + 1)}>Next</Button></div></div>
         </div>
       </div>
 

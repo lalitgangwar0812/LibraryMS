@@ -4,6 +4,7 @@ import AdminLayout from '../../../components/layout/AdminLayout'
 import SectionHeader from '../../../components/layout/SectionHeader'
 import { Button } from '../../../components/ui/button'
 import api from '../../../components/common/api'
+import { PAGE_SIZE } from '../../../constants/pagination'
 
 const ratingOptions = [
   { value: '', label: 'All ratings' },
@@ -21,6 +22,7 @@ function FeedbackPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedFeedback, setSelectedFeedback] = useState(null)
+  const [page, setPage] = useState(1)
 
   const fetchFeedback = async () => {
     try {
@@ -46,6 +48,12 @@ function FeedbackPage() {
   }, [search, rating])
 
   const feedbackCount = feedback.length
+  const totalPages = Math.max(1, Math.ceil(feedbackCount / PAGE_SIZE))
+  const paginatedFeedback = useMemo(() => feedback.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [feedback, page])
+
+  useEffect(() => {
+    setPage(1)
+  }, [search, rating])
 
   return (
     <AdminLayout>
@@ -108,7 +116,7 @@ function FeedbackPage() {
                     </td>
                   </tr>
                 ) : (
-                  feedback.map((item) => (
+                  paginatedFeedback.map((item) => (
                     <tr key={item.feedbackId} className="border-t border-slate-200 hover:bg-slate-50">
                       <td className="px-4 py-3 font-medium text-slate-900">{item.userName}</td>
                       <td className="px-4 py-3 text-slate-600">{item.rating} / 5</td>
@@ -126,7 +134,7 @@ function FeedbackPage() {
             </table>
           </div>
 
-          <div className="mt-4 text-sm text-slate-500">Showing {feedbackCount} feedback item{feedbackCount === 1 ? '' : 's'}.</div>
+          <div className="mt-4 flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between"><span>Showing {paginatedFeedback.length} of {feedbackCount} feedback item{feedbackCount === 1 ? '' : 's'}.</span><div className="flex items-center gap-2"><Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage((value) => value - 1)}>Previous</Button><span>Page {page} of {totalPages}</span><Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage((value) => value + 1)}>Next</Button></div></div>
         </div>
       </div>
 

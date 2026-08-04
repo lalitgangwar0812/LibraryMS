@@ -5,8 +5,7 @@ import SectionHeader from '../../../components/layout/SectionHeader'
 import { Button } from '../../../components/ui/button'
 import api from '../../../components/common/api'
 import { useAuth } from '../../../components/common/AuthContext'
-
-const PAGE_SIZE = 6
+import { PAGE_SIZE } from '../../../constants/pagination'
 
 function BooksPage() {
   const { user } = useAuth()
@@ -45,7 +44,7 @@ function BooksPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get(isLibrarian ? '/books/categories' : '/categories')
+      const response = await api.get('/books/categories')
       setCategories(response.data)
     } catch (error) {
       console.error('Failed to fetch categories', error)

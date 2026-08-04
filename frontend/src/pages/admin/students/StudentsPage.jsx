@@ -5,8 +5,7 @@ import SectionHeader from '../../../components/layout/SectionHeader'
 import { Button } from '../../../components/ui/button'
 import api from '../../../components/common/api'
 import { useAuth } from '../../../components/common/AuthContext'
-
-const PAGE_SIZE = 6
+import { PAGE_SIZE } from '../../../constants/pagination'
 
 function StudentsPage() {
   const { user } = useAuth()

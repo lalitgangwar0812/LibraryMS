@@ -12,7 +12,7 @@ import lombok.Setter;
 public class LibrarianRequest {
 
     @NotBlank(message = "Name is required")
-    @Size(max = 150, message = "Name cannot exceed 150 characters")
+    @Size(min = 3, max = 150, message = "Name must be between 3 and 150 characters")
     private String fullName;
 
     @NotBlank(message = "Email is required")
@@ -20,7 +20,7 @@ public class LibrarianRequest {
     private String email;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^[0-9+\\-\\s]{7,15}$", message = "Please enter a valid phone number")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must contain exactly 10 digits")
     private String phoneNumber;
 
     @Size(min = 8, max = 72, message = "Password must be between 8 and 72 characters")
