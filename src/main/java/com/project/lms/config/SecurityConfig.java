@@ -97,8 +97,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/books/**")
                         .hasRole("ADMIN")
 
-                        .requestMatchers("/api/news", "/api/news/search")
-                        .hasAnyRole("ADMIN", "STUDENT", "LIBRARIAN")
+                        .requestMatchers(HttpMethod.GET, "/api/news/**")
+                        .permitAll()
+
                         .requestMatchers("/api/complaints/**", "/api/feedback/**", "/api/news/**", "/api/enquiries/**")
                         .hasAnyRole("ADMIN", "STUDENT")
                         .anyRequest()

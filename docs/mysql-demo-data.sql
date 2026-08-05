@@ -14,18 +14,45 @@ ON DUPLICATE KEY UPDATE category_name = VALUES(category_name);
 
 -- 2. Users: one administrator, five librarians, and twenty-five students.
 INSERT INTO users (name,email,password,phone_number,role,enabled) VALUES
-('Lalit Gangwar','lalit@gmail.com',@demo_password,'9876501001','ADMIN',TRUE),
-('Ananya Verma','ananya.verma@libraryms.demo',@demo_password,'9876501101','LIBRARIAN',TRUE),
-('Rohit Mehta','rohit.mehta@libraryms.demo',@demo_password,'9876501102','LIBRARIAN',TRUE),
-('Priya Nair','priya.nair@libraryms.demo',@demo_password,'9876501103','LIBRARIAN',TRUE),
-('Karan Shah','karan.shah@libraryms.demo',@demo_password,'9876501104','LIBRARIAN',TRUE),
-('Meera Iyer','meera.iyer@libraryms.demo',@demo_password,'9876501105','LIBRARIAN',TRUE),
-('Aarav Sharma','aarav.sharma@student.demo',@demo_password,'9876502001','STUDENT',TRUE),('Diya Patel','diya.patel@student.demo',@demo_password,'9876502002','STUDENT',TRUE),('Vivaan Gupta','vivaan.gupta@student.demo',@demo_password,'9876502003','STUDENT',TRUE),('Ananya Singh','ananya.singh@student.demo',@demo_password,'9876502004','STUDENT',TRUE),('Aditya Kumar','aditya.kumar@student.demo',@demo_password,'9876502005','STUDENT',TRUE),
-('Isha Rao','isha.rao@student.demo',@demo_password,'9876502006','STUDENT',TRUE),('Kabir Khan','kabir.khan@student.demo',@demo_password,'9876502007','STUDENT',TRUE),('Sneha Joshi','sneha.joshi@student.demo',@demo_password,'9876502008','STUDENT',TRUE),('Arjun Malhotra','arjun.malhotra@student.demo',@demo_password,'9876502009','STUDENT',TRUE),('Nisha Kapoor','nisha.kapoor@student.demo',@demo_password,'9876502010','STUDENT',TRUE),
-('Rohan Das','rohan.das@student.demo',@demo_password,'9876502011','STUDENT',TRUE),('Kavya Menon','kavya.menon@student.demo',@demo_password,'9876502012','STUDENT',TRUE),('Yash Jain','yash.jain@student.demo',@demo_password,'9876502013','STUDENT',TRUE),('Tanvi Kulkarni','tanvi.kulkarni@student.demo',@demo_password,'9876502014','STUDENT',TRUE),('Siddharth Roy','siddharth.roy@student.demo',@demo_password,'9876502015','STUDENT',TRUE),
-('Pooja Bansal','pooja.bansal@student.demo',@demo_password,'9876502016','STUDENT',TRUE),('Harsh Vardhan','harsh.vardhan@student.demo',@demo_password,'9876502017','STUDENT',TRUE),('Riya Chawla','riya.chawla@student.demo',@demo_password,'9876502018','STUDENT',FALSE),('Manav Sethi','manav.sethi@student.demo',@demo_password,'9876502019','STUDENT',TRUE),('Aditi Bose','aditi.bose@student.demo',@demo_password,'9876502020','STUDENT',TRUE),
-('Neel Agrawal','neel.agrawal@student.demo',@demo_password,'9876502021','STUDENT',FALSE),('Simran Kaur','simran.kaur@student.demo',@demo_password,'9876502022','STUDENT',TRUE),('Dev Arora','dev.arora@student.demo',@demo_password,'9876502023','STUDENT',TRUE),('Maya Thomas','maya.thomas@student.demo',@demo_password,'9876502024','STUDENT',TRUE),('Ibrahim Ali','ibrahim.ali@student.demo',@demo_password,'9876502025','STUDENT',TRUE)
-ON DUPLICATE KEY UPDATE name=VALUES(name),password=VALUES(password),phone_number=VALUES(phone_number),role=VALUES(role),enabled=VALUES(enabled);
+('Lalit Gangwar','admin@libraryms.demo',@admin_password,'9876501001','ADMIN',TRUE),
+
+('Ananya Verma','ananya.verma@libraryms.demo',@librarian_password,'9876501101','LIBRARIAN',TRUE),
+('Rohit Mehta','rohit.mehta@libraryms.demo',@librarian_password,'9876501102','LIBRARIAN',TRUE),
+('Priya Nair','priya.nair@libraryms.demo',@librarian_password,'9876501103','LIBRARIAN',TRUE),
+('Karan Shah','karan.shah@libraryms.demo',@librarian_password,'9876501104','LIBRARIAN',TRUE),
+('Meera Iyer','meera.iyer@libraryms.demo',@librarian_password,'9876501105','LIBRARIAN',TRUE),
+
+('Aarav Sharma','aarav.sharma@student.demo',@student_password,'9876502001','STUDENT',TRUE),
+('Diya Patel','diya.patel@student.demo',@student_password,'9876502002','STUDENT',TRUE),
+('Vivaan Gupta','vivaan.gupta@student.demo',@student_password,'9876502003','STUDENT',TRUE),
+('Ananya Singh','ananya.singh@student.demo',@student_password,'9876502004','STUDENT',TRUE),
+('Aditya Kumar','aditya.kumar@student.demo',@student_password,'9876502005','STUDENT',TRUE),
+('Isha Rao','isha.rao@student.demo',@student_password,'9876502006','STUDENT',TRUE),
+('Kabir Khan','kabir.khan@student.demo',@student_password,'9876502007','STUDENT',TRUE),
+('Sneha Joshi','sneha.joshi@student.demo',@student_password,'9876502008','STUDENT',TRUE),
+('Arjun Malhotra','arjun.malhotra@student.demo',@student_password,'9876502009','STUDENT',TRUE),
+('Nisha Kapoor','nisha.kapoor@student.demo',@student_password,'9876502010','STUDENT',TRUE),
+('Rohan Das','rohan.das@student.demo',@student_password,'9876502011','STUDENT',TRUE),
+('Kavya Menon','kavya.menon@student.demo',@student_password,'9876502012','STUDENT',TRUE),
+('Yash Jain','yash.jain@student.demo',@student_password,'9876502013','STUDENT',TRUE),
+('Tanvi Kulkarni','tanvi.kulkarni@student.demo',@student_password,'9876502014','STUDENT',TRUE),
+('Siddharth Roy','siddharth.roy@student.demo',@student_password,'9876502015','STUDENT',TRUE),
+('Pooja Bansal','pooja.bansal@student.demo',@student_password,'9876502016','STUDENT',TRUE),
+('Harsh Vardhan','harsh.vardhan@student.demo',@student_password,'9876502017','STUDENT',TRUE),
+('Riya Chawla','riya.chawla@student.demo',@student_password,'9876502018','STUDENT',FALSE),
+('Manav Sethi','manav.sethi@student.demo',@student_password,'9876502019','STUDENT',TRUE),
+('Aditi Bose','aditi.bose@student.demo',@student_password,'9876502020','STUDENT',TRUE),
+('Neel Agrawal','neel.agrawal@student.demo',@student_password,'9876502021','STUDENT',FALSE),
+('Simran Kaur','simran.kaur@student.demo',@student_password,'9876502022','STUDENT',TRUE),
+('Dev Arora','dev.arora@student.demo',@student_password,'9876502023','STUDENT',TRUE),
+('Maya Thomas','maya.thomas@student.demo',@student_password,'9876502024','STUDENT',TRUE),
+('Ibrahim Ali','ibrahim.ali@student.demo',@student_password,'9876502025','STUDENT',TRUE)
+ON DUPLICATE KEY UPDATE
+name=VALUES(name),
+password=VALUES(password),
+phone_number=VALUES(phone_number),
+role=VALUES(role),
+enabled=VALUES(enabled);
 
 -- 3. One hundred real college-library titles. Category IDs are resolved by category name.
 DROP TEMPORARY TABLE IF EXISTS demo_books;
@@ -82,14 +109,14 @@ FROM (
     SELECT
         'Extended library hours' AS title,
         'The library remains open until 9 PM during examination week.' AS description,
-        'lalit@gmail.com' AS author_email,
+        'admin@libraryms.demo' AS author_email,
         DATE_SUB(NOW(), INTERVAL 2 DAY) AS created_at
     UNION ALL SELECT 'New Spring Boot titles added', 'New backend development books are now available in the Java section.', 'ananya.verma@libraryms.demo', DATE_SUB(NOW(), INTERVAL 5 DAY)
     UNION ALL SELECT 'Reading Week 2026', 'Join author talks, a book swap, and daily reading challenges.', 'priya.nair@libraryms.demo', DATE_SUB(NOW(), INTERVAL 9 DAY)
     UNION ALL SELECT 'Database maintenance notice', 'The digital catalogue will be unavailable for one hour on Sunday.', 'rohit.mehta@libraryms.demo', DATE_SUB(NOW(), INTERVAL 13 DAY)
     UNION ALL SELECT 'Coding competition registrations open', 'Register at the circulation desk before Friday.', 'karan.shah@libraryms.demo', DATE_SUB(NOW(), INTERVAL 18 DAY)
     UNION ALL SELECT 'Book donation drive', 'Donate gently used academic and fiction books this month.', 'meera.iyer@libraryms.demo', DATE_SUB(NOW(), INTERVAL 25 DAY)
-    UNION ALL SELECT 'Holiday closure notice', 'The library will be closed for the national holiday.', 'lalit@gmail.com', DATE_SUB(NOW(), INTERVAL 32 DAY)
+    UNION ALL SELECT 'Holiday closure notice', 'The library will be closed for the national holiday.', 'admin@libraryms.demo', DATE_SUB(NOW(), INTERVAL 32 DAY)
     UNION ALL SELECT 'Digital library launch', 'Remote access to selected journals is now available.', 'ananya.verma@libraryms.demo', DATE_SUB(NOW(), INTERVAL 40 DAY)
     UNION ALL SELECT 'Hackathon resource corner', 'Curated cloud and DevOps resources are available near the help desk.', 'rohit.mehta@libraryms.demo', DATE_SUB(NOW(), INTERVAL 48 DAY)
     UNION ALL SELECT 'Semester return reminder', 'Please return books before the semester break.', 'priya.nair@libraryms.demo', DATE_SUB(NOW(), INTERVAL 57 DAY)
@@ -98,8 +125,9 @@ FROM (
     UNION ALL SELECT 'Reading room etiquette', 'Please keep phone calls outside the reading room.', 'rohit.mehta@libraryms.demo', DATE_SUB(NOW(), INTERVAL 80 DAY)
     UNION ALL SELECT 'Exam preparation resources', 'Past papers and study guides are available at the reference desk.', 'priya.nair@libraryms.demo', DATE_SUB(NOW(), INTERVAL 88 DAY)
     UNION ALL SELECT 'Library orientation', 'New students can attend the weekly library orientation tour.', 'karan.shah@libraryms.demo', DATE_SUB(NOW(), INTERVAL 96 DAY)
+
     UNION ALL SELECT 'E-book access update', 'Several new publishers are now available through the digital library.', 'meera.iyer@libraryms.demo', DATE_SUB(NOW(), INTERVAL 104 DAY)
-    UNION ALL SELECT 'Open source workshop', 'A practical Git and GitHub workshop will be held next week.', 'lalit@gmail.com', DATE_SUB(NOW(), INTERVAL 112 DAY)
+    UNION ALL SELECT 'Open source workshop', 'A practical Git and GitHub workshop will be held next week.', 'admin@libraryms.demo', DATE_SUB(NOW(), INTERVAL 112 DAY)
     UNION ALL SELECT 'Journal subscriptions renewed', 'Current engineering and science journals are available online.', 'ananya.verma@libraryms.demo', DATE_SUB(NOW(), INTERVAL 120 DAY)
     UNION ALL SELECT 'Summer book club', 'Vote for this month''s fiction book club selection at the desk.', 'rohit.mehta@libraryms.demo', DATE_SUB(NOW(), INTERVAL 128 DAY)
     UNION ALL SELECT 'Catalogue search tips', 'Try title, author, and ISBN searches to find resources faster.', 'priya.nair@libraryms.demo', DATE_SUB(NOW(), INTERVAL 136 DAY)

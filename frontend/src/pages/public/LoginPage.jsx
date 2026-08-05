@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { ArrowRight, BookOpen, LockKeyhole, Mail } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Copy, LockKeyhole, Mail, ShieldCheck } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { useAuth } from '../../components/common/AuthContext'
 
@@ -25,6 +25,14 @@ function LoginPage() {
   const [errors, setErrors] = useState({})
   const [submitError, setSubmitError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showDemoCredentials, setShowDemoCredentials] = useState(false)
+  const [copied, setCopied] = useState('')
+
+  const demoCredentials = [
+    { role: 'Admin', email: 'admin@libraryms.demo', password: 'Admin@123' },
+    { role: 'Librarian', email: 'ananya.verma@libraryms.demo', password: 'Library@123' },
+    { role: 'Student', email: 'aarav.sharma@student.demo', password: 'Student@123' },
+  ]
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -74,33 +82,42 @@ function LoginPage() {
     }
   }
 
+  const copyCredential = async (credential) => {
+    const value = `${credential.email}\n${credential.password}`
+    try {
+      await navigator.clipboard.writeText(value)
+      setCopied(credential.role)
+      window.setTimeout(() => setCopied(''), 1800)
+    } catch {
+      setSubmitError('Unable to copy credentials. Please copy them manually.')
+    }
+  }
+
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-slate-50 px-6 py-16 sm:px-8 lg:px-12">
-      <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
-          <div className="inline-flex rounded-full bg-sky-50 p-3 text-sky-600">
-            <BookOpen size={22} />
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
+        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+          <Link to="/" className="flex items-center gap-2 font-semibold text-slate-950"><span className="grid h-9 w-9 place-items-center rounded-lg bg-slate-950 text-white"><BookOpen size={18} /></span>LibraryMS</Link>
+          <Link to="/" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-sky-700"><ArrowLeft size={16} />Home</Link>
+        </nav>
+      </header>
+      <main className="relative overflow-hidden px-5 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <div className="relative mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
+        <section className="rounded-3xl border border-slate-200 bg-slate-950 p-7 text-white shadow-xl shadow-slate-950/10 sm:p-9">
+          <div className="inline-flex rounded-xl bg-white/10 p-3 text-sky-300"><BookOpen size={22} /></div>
+          <p className="mt-6 text-sm font-semibold uppercase tracking-[0.18em] text-sky-300">LibraryMS workspace</p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Welcome back to your library.</h1>
+          <p className="mt-4 max-w-md text-base leading-7 text-slate-300">Sign in to continue managing your reading, circulation, and library operations from one secure workspace.</p>
+          <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="flex items-center justify-between text-xs text-slate-400"><span>Library overview</span><span className="rounded-full bg-emerald-400/15 px-2 py-1 font-semibold text-emerald-300">LIVE</span></div>
+            <div className="mt-4 grid grid-cols-3 gap-3">{[['Books', '12.4k'], ['Issued', '248'], ['News', '18']].map(([label, value]) => <div key={label} className="rounded-xl bg-white/10 p-3"><p className="text-lg font-semibold text-white">{value}</p><p className="mt-1 text-xs text-slate-400">{label}</p></div>)}</div>
+            <div className="mt-4 space-y-2">{['Catalog activity updated', 'New issue recorded', 'Announcement published'].map((item, index) => <div key={item} className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2 text-xs text-slate-300"><span className={`h-2 w-2 rounded-full ${index === 1 ? 'bg-emerald-400' : 'bg-sky-400'}`} />{item}</div>)}</div>
           </div>
-          <h1 className="mt-6 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-            Welcome back to LibraryMS
-          </h1>
-          <p className="mt-4 text-lg text-slate-600">
-            Sign in to access your account, reading history, and library resources.
-          </p>
+          <div className="mt-7 space-y-3 text-sm text-slate-300"><p className="flex items-center gap-3"><ShieldCheck size={18} className="text-sky-300" />Protected with JWT-based authentication.</p><p className="flex items-center gap-3"><Check size={18} className="text-emerald-300" />Tailored dashboards for every role.</p></div>
+        </section>
 
-          <div className="mt-8 space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
-            <div className="flex items-start gap-3">
-              <LockKeyhole className="mt-0.5 text-sky-600" size={18} />
-              <span>Your session stays protected with JWT-based authentication.</span>
-            </div>
-            <div className="flex items-start gap-3">
-              <Mail className="mt-0.5 text-sky-600" size={18} />
-              <span>Use your registered email and password to continue securely.</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
+        <section className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xl shadow-slate-950/5 sm:p-9">
           <h2 className="text-2xl font-semibold text-slate-900">Sign in</h2>
           <p className="mt-2 text-sm text-slate-600">Enter your credentials to continue.</p>
 
@@ -120,7 +137,7 @@ function LoginPage() {
                   placeholder="name@library.edu"
                 />
               </div>
-              {errors.email ? <p className="mt-2 text-sm text-red-500">{errors.email}</p> : null}
+              {errors.email ? <p className="mt-2 text-sm text-red-500" role="alert">{errors.email}</p> : null}
             </div>
 
             <div>
@@ -138,11 +155,11 @@ function LoginPage() {
                   placeholder="Enter your password"
                 />
               </div>
-              {errors.password ? <p className="mt-2 text-sm text-red-500">{errors.password}</p> : null}
+              {errors.password ? <p className="mt-2 text-sm text-red-500" role="alert">{errors.password}</p> : null}
             </div>
 
             {submitError ? (
-              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600" role="alert">
                 {submitError}
               </div>
             ) : null}
@@ -153,13 +170,52 @@ function LoginPage() {
             </Button>
 
             <div className="text-center text-sm text-slate-600">
-              <a href="/register" className="font-medium text-sky-600 hover:text-sky-700">
+              <Link to="/register" className="font-medium text-sky-600 hover:text-sky-700">
                 Create Student Account
-              </a>
+              </Link>
             </div>
           </form>
+          <div className="mt-7 border-t border-slate-100 pt-5">
+            <button type="button" onClick={() => setShowDemoCredentials((value) => !value)} aria-expanded={showDemoCredentials} className="flex w-full items-center justify-between rounded-xl px-1 text-left text-sm font-semibold text-slate-700 hover:text-sky-700">Demo Credentials <ChevronDown size={17} className={`transition-transform ${showDemoCredentials ? 'rotate-180' : ''}`} /></button>
+            
+            {showDemoCredentials ? (
+              <div className="mt-4 space-y-2 rounded-2xl bg-slate-50 p-3">
+                {demoCredentials.map((credential) => (
+                  <div
+                    key={credential.role}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-slate-900">
+                        {credential.role}
+                      </p>
+
+                      <p className="truncate text-xs text-slate-500">
+                        {credential.email}
+                        <span className="mx-1" aria-hidden="true">·</span>
+                        <span className="font-medium text-slate-700">
+                          {credential.password}
+                        </span>
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => copyCredential(credential)}
+                      aria-label={`Copy ${credential.role} demo credentials`}
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-slate-200 text-slate-600 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700"
+                    >
+                      {copied === credential.role ? <Check size={15} /> : <Copy size={15} />}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <Link to="/" className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-sky-700"><ArrowLeft size={16} />Back to Home</Link>
+        </section>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

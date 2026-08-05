@@ -257,6 +257,9 @@ public class BookIssueService {
         if (status.equals("OVERDUE")) {
             return isOverdue(issue);
         }
+        if (status.equals(IssueStatus.ISSUED.name())) {
+            return issue.getStatus() == IssueStatus.ISSUED && !isOverdue(issue);
+        }
         return issue.getStatus().name().equals(status);
     }
 

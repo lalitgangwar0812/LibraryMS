@@ -53,7 +53,7 @@ function PublicNewsPage() {
 
           {loading ? (
             <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-500">Loading published news...</div>
-          ) : filteredNews.length === 0 ? (
+          ) : error ? null : filteredNews.length === 0 ? (
             <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center text-sm text-slate-500">No published news available right now.</div>
           ) : (
             <div className="mt-8 grid gap-5 lg:grid-cols-2">

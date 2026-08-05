@@ -124,4 +124,46 @@ class BookIssueServiceTest {
         assertEquals(11, issues.get(1).getIssueId());
         assertEquals("Jane Doe", issues.get(0).getUserName());
     }
+
+    @Test
+    void getAllIssuesFiltersOnlyActiveIssuedWhenStatusIssued() {
+        User student = User.builder().id(1).fullName("Jane Doe").email("jane@example.com").role(Role.STUDENT).enabled(true).build();
+        Book book = Book.builder().bookId(2).title("Clean Code").build();
+        BookIssue activeIssued = BookIssue.builder().issueId(20).user(student).book(book).issueDate(LocalDate.now().minusDays(5)).dueDate(LocalDate.now().plusDays(2)).status(IssueStatus.ISSUED).build();
+        BookIssue overdueIssued = BookIssue.builder().issueId(21).user(student).book(book).issueDate(LocalDate.now().minusDays(15)).dueDate(LocalDate.now().minusDays(2)).status(IssueStatus.ISSUED).build();
+        when(bookIssueRepository.findAllByOrderByIssueDateDesc()).thenReturn(List.of(activeIssued, overdueIssued));
+
+        List<BookIssueResponse> results = bookIssueService.getAllIssues(null, "ISSUED");
+
+        assertEquals(1, results.size());
+        assertEquals(20, results.get(0).getIssueId());
+    }
+
+    @Test
+    void getAllIssuesFiltersOnlyOverdueWhenStatusOverdue() {
+        User student = User.builder().id(1).fullName("Jane Doe").email("jane@example.com").role(Role.STUDENT).enabled(true).build();
+        Book book = Book.builder().bookId(2).title("Clean Code").build();
+        BookIssue activeIssued = BookIssue.builder().issueId(20).user(student).book(book).issueDate(LocalDate.now().minusDays(5)).dueDate(LocalDate.now().plusDays(2)).status(IssueStatus.ISSUED).build();
+        BookIssue overdueIssued = BookIssue.builder().issueId(21).user(student).book(book).issueDate(LocalDate.now().minusDays(15)).dueDate(LocalDate.now().minusDays(2)).status(IssueStatus.ISSUED).build();
+        when(bookIssueRepository.findAllByOrderByIssueDateDesc()).thenReturn(List.of(activeIssued, overdueIssued));
+
+        List<BookIssueResponse> results = bookIssueService.getAllIssues(null, "OVERDUE");
+
+        assertEquals(1, results.size());
+        assertEquals(21, results.get(0).getIssueId());
+    }
+
+    @Test
+    void getAllIssuesFiltersOnlyReturnedWhenStatusReturned() {
+        User student = User.builder().id(1).fullName("Jane Doe").email("jane@example.com").role(Role.STUDENT).enabled(true).build();
+        Book book = Book.builder().bookId(2).title("Clean Code").build();
+        BookIssue returnedIssue = BookIssue.builder().issueId(22).user(student).book(book).issueDate(LocalDate.now().minusDays(10)).dueDate(LocalDate.now().minusDays(3)).returnDate(LocalDate.now().minusDays(2)).status(IssueStatus.RETURNED).build();
+        BookIssue activeIssued = BookIssue.builder().issueId(20).user(student).book(book).issueDate(LocalDate.now().minusDays(5)).dueDate(LocalDate.now().plusDays(2)).status(IssueStatus.ISSUED).build();
+        when(bookIssueRepository.findAllByOrderByIssueDateDesc()).thenReturn(List.of(returnedIssue, activeIssued));
+
+        List<BookIssueResponse> results = bookIssueService.getAllIssues(null, "RETURNED");
+
+        assertEquals(1, results.size());
+        assertEquals(22, results.get(0).getIssueId());
+    }
 }

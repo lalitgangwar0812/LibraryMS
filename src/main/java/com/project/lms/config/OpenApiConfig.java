@@ -28,7 +28,7 @@ public class OpenApiConfig {
 
                         .contact(new Contact()
                                 .name("Lalit Gangwar")
-                                .email("lalit@gmail.com"))
+                                .email("admin@libraryms.demo"))
 
                         .license(new License()
                                 .name("Apache 2.0")))

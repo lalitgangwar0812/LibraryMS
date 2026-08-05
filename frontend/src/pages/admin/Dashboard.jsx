@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { BookOpen, BookText, ClipboardList, GraduationCap, LayoutDashboard, TriangleAlert, Users } from 'lucide-react'
+import { BookOpen, BookText, ClipboardList, GraduationCap, TriangleAlert, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import AdminLayout from '../../components/layout/AdminLayout'
 import DashboardCard from '../../components/layout/DashboardCard'
@@ -54,7 +54,7 @@ function Dashboard() {
 
         {error ? <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
         {loading ? <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-500">Loading dashboard statistics...</div> : <>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{cards.map((card) => <DashboardCard key={card.title} {...card} />)}</div>
+          <div className="lms-stagger grid gap-4 md:grid-cols-2 xl:grid-cols-3">{cards.map((card) => <DashboardCard key={card.title} {...card} />)}</div>
           <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><SectionHeader title="Book issue activity" description="Current loans and upcoming due dates" action={<Button asChild variant="outline" size="sm"><Link to="/admin/issues">View all</Link></Button>} />
               <div className="overflow-x-auto rounded-2xl border border-slate-200"><table className="min-w-full text-left text-sm"><thead className="bg-slate-50 text-slate-600"><tr><th className="px-4 py-3">Student</th><th className="px-4 py-3">Book</th><th className="px-4 py-3">Due</th></tr></thead><tbody>{recentIssues.length ? recentIssues.map((issue) => <tr key={issue.issueId} className="border-t border-slate-200"><td className="px-4 py-3 font-medium text-slate-900">{issue.userName}</td><td className="px-4 py-3 text-slate-600">{issue.bookTitle}</td><td className={`px-4 py-3 ${issue.overdue ? 'font-medium text-red-600' : 'text-slate-600'}`}>{issue.overdue ? 'Overdue: ' : ''}{issue.dueDate}</td></tr>) : <tr><td colSpan="3" className="px-4 py-8 text-center text-slate-500">No active book issues.</td></tr>}</tbody></table></div>

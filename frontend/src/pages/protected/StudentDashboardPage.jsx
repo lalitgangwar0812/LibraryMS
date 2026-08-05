@@ -88,7 +88,7 @@ function StudentDashboardPage() {
           <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-500">Loading your dashboard...</div>
         ) : (
           <>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="lms-stagger grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {cards.map((card) => (
                 <DashboardCard key={card.title} {...card} />
               ))}

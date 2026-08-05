@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useInView } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
-  ArrowRight, Bell, BookOpen, BookOpenCheck, ChartNoAxesCombined, Check, CircleHelp,
-  Code2, GraduationCap, KeyRound, Layers3, LibraryBig, Mail,
-  Menu, MessageSquareMore, NotebookTabs, Search, ShieldCheck, Sparkles, Users,
-  UserRoundCog, X,
+  ArrowRight, Bell, BookOpen, BookOpenCheck, ChartNoAxesCombined, Check,
+  GraduationCap, Layers3, LibraryBig, Mail, Menu, Search, ShieldCheck, Sparkles, X,
+  UserRoundCog,
 } from 'lucide-react'
+import { FaGithub, FaLinkedin } from 'react-icons/fa'
 import api from '../../components/common/api'
 
 const reveal = {
@@ -20,7 +20,7 @@ const features = [
   { icon: Bell, title: 'Smart Notifications', description: 'Keep readers current on due dates, returns, and library announcements.' },
 ]
 
-const technology = ['Java', 'Spring Boot', 'Spring Security', 'JWT', 'PostgreSQL', 'React', 'Vite', 'Tailwind CSS']
+const technology = ['Java', 'Spring Boot', 'Spring Security', 'JWT', 'MySQL', 'React', 'Vite', 'Tailwind CSS']
 
 const roles = [
   { icon: UserRoundCog, title: 'Admin', description: 'Oversee people, inventory, announcements, reports, and library operations.', accent: 'bg-violet-100 text-violet-700' },
@@ -29,60 +29,39 @@ const roles = [
 ]
 
 const reasons = [
-  { icon: Search, text: 'Fast Book Search' }, { icon: KeyRound, text: 'Secure Authentication' },
-  { icon: NotebookTabs, text: 'Issue Tracking' }, { icon: Users, text: 'Role Based Access' },
-  { icon: CircleHelp, text: 'Complaint System' }, { icon: MessageSquareMore, text: 'Feedback System' },
-  { icon: Bell, text: 'News Management' }, { icon: ChartNoAxesCombined, text: 'Modern Dashboard' },
+  { icon: BookOpenCheck, text: 'Clear workflows for circulation, search, and announcements' },
+  { icon: ShieldCheck, text: 'Secure role-aware access for every library member' },
+  { icon: Layers3, text: 'Responsive experience across desktop and mobile' },
+  { icon: Sparkles, text: 'Polished interactions with subtle motion and clarity' },
 ]
 
 const counters = [
-  { value: 25000, suffix: '+', label: 'Books' }, { value: 1500, suffix: '+', label: 'Students' },
-  { value: 8400, suffix: '+', label: 'Issues' }, { value: 120, suffix: '+', label: 'News' },
+  { label: 'Catalog titles', value: '12.4K' },
+  { label: 'Active members', value: '1.8K' },
+  { label: 'Monthly loans', value: '4.2K' },
+  { label: 'Managed roles', value: '3' },
 ]
 
-function CountUp({ value, suffix }) {
-  const [count, setCount] = useState(0)
-
-  const ref = useRef(null)
-
-  const isInView = useInView(ref, {
-    once: true,
-  })
-
-  useEffect(() => {
-    if (!isInView) return
-
-    let frame
-
-    const start = performance.now()
-    const duration = 1200
-
-    const tick = (now) => {
-      const progress = Math.min((now - start) / duration, 1)
-
-      setCount(
-        Math.floor(value * (1 - Math.pow(1 - progress, 3)))
-      )
-
-      if (progress < 1) {
-        frame = requestAnimationFrame(tick)
-      }
-    }
-
-    frame = requestAnimationFrame(tick)
-
-    return () => {
-      if (frame) cancelAnimationFrame(frame)
-    }
-  }, [isInView, value])
-
-  return (
-    <span ref={ref}>
-      {count.toLocaleString()}
-      {suffix}
-    </span>
-  )
-}
+const demoNews = [
+  {
+    newsId: 'demo-1',
+    title: 'Summer Reading Week begins Monday',
+    description: 'Family programs, late hours, and curated reading lists launch to celebrate local stories and learning.',
+    createdAt: 'Aug 12, 2026',
+  },
+  {
+    newsId: 'demo-2',
+    title: 'Library will remain closed on Independence Day',
+    description: 'The building is closed for the holiday; digital resources remain available for members on the catalog portal.',
+    createdAt: 'Jul 04, 2026',
+  },
+  {
+    newsId: 'demo-3',
+    title: 'New Computer Science books added',
+    description: 'Browse fresh titles in programming, AI, and data science now available through the library catalog.',
+    createdAt: 'Aug 01, 2026',
+  },
+]
 
 function SectionIntro({ eyebrow, title, description, align = 'center', inverted = false }) {
   return (
@@ -129,13 +108,24 @@ function HomePage() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
     window.addEventListener('scroll', onScroll)
-    const loadNews = async () => { try { const response = await api.get('/news'); setNews(response.data?.slice(0, 3) || []) } catch { setNews([]) } finally { setNewsLoading(false) } }
+    const loadNews = async () => {
+      try {
+        const response = await api.get('/news')
+        const allNews = response.data || []
+        setNews(Array.isArray(allNews) ? allNews.slice(0, 3) : [])
+      } catch {
+        setNews([])
+      } finally {
+        setNewsLoading(false)
+      }
+    }
     loadNews()
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   const closeMenu = () => setOpen(false)
-  const navLinks = [{ label: 'Home', href: '#home' }, { label: 'Features', href: '#features' }, { label: 'Technology', href: '#technology' }, { label: 'About', href: '#about' }]
+  const navLinks = [{ label: 'Home', href: '#home' }, { label: 'Features', href: '#features' }, { label: 'Technology', href: '#technology' }, { label: 'News', href: '#news' }, { label: 'About', href: '#about' }]
+  const displayNews = news.length > 0 ? news.slice(0, 3) : demoNews
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-white text-slate-900">
@@ -172,16 +162,16 @@ function HomePage() {
 
         <section className="bg-slate-50 px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.08 } } }} className="mx-auto max-w-7xl"><SectionIntro eyebrow="Why LibraryMS" title="Designed around the library work that matters" description="Thoughtful tools remove routine friction and make every interaction easier to manage." /><div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{reasons.map(({ icon: Icon, text }) => <motion.div variants={reveal} whileHover={{ y: -3 }} key={text} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"><span className="rounded-md bg-sky-50 p-2 text-sky-700"><Icon size={17} /></span><span className="text-sm font-semibold text-slate-800">{text}</span></motion.div>)}</div></motion.div></section>
 
-        <motion.section initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="px-5 py-20 sm:px-8 lg:px-10"><div className="mx-auto grid max-w-7xl gap-10 rounded-xl bg-slate-950 px-7 py-10 text-white lg:grid-cols-[0.7fr_1.3fr] lg:items-center lg:px-12"><SectionIntro inverted eyebrow="By the numbers" title="A dashboard made for momentum" description="Monitor the activity that keeps your library community thriving." align="left" /><div className="grid grid-cols-2 gap-4 sm:grid-cols-4">{counters.map((stat) => <motion.div variants={reveal} key={stat.label} className="border-l border-white/15 pl-4"><p className="text-2xl font-semibold sm:text-3xl"><CountUp value={stat.value} suffix={stat.suffix} /></p><p className="mt-1 text-sm text-slate-400">{stat.label}</p></motion.div>)}</div></div></motion.section>
+        <motion.section initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="px-5 py-20 sm:px-8 lg:px-10"><div className="mx-auto grid max-w-7xl gap-10 rounded-xl bg-slate-950 px-7 py-10 text-white lg:grid-cols-[0.7fr_1.3fr] lg:items-center lg:px-12"><SectionIntro inverted eyebrow="By the numbers" title="A dashboard made for momentum" description="Monitor the activity that keeps your library community thriving." align="left" /><div className="grid grid-cols-2 gap-4 sm:grid-cols-4">{counters.map((stat) => <motion.div variants={reveal} key={stat.label} className="border-l border-white/15 pl-4"><p className="text-2xl font-semibold sm:text-3xl">{stat.value}</p><p className="mt-1 text-sm text-slate-400">{stat.label}</p></motion.div>)}</div></div></motion.section>
 
-        <section id="news" className="border-y border-slate-200 bg-slate-50 px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="mx-auto max-w-7xl"><SectionIntro eyebrow="Latest news" title="Updates from the library" description="Announcements and important information, shared with the community." />{newsLoading ? <div className="mt-10 grid gap-5 md:grid-cols-3">{[1, 2, 3].map((item) => <div key={item} className="h-48 animate-pulse rounded-lg bg-slate-200" />)}</div> : news.length ? <div className="mt-12 grid gap-5 lg:grid-cols-3">{news.map((item) => <motion.article variants={reveal} whileHover={{ y: -4 }} key={item.newsId} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-center gap-2 text-sm font-medium text-sky-700"><Bell size={16} />Library announcement</div><h3 className="mt-5 text-xl font-semibold text-slate-950">{item.title}</h3><p className="mt-3 line-clamp-3 leading-7 text-slate-600">{item.description}</p><p className="mt-5 text-sm text-slate-400">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Recently posted'}</p></motion.article>)}</div> : <motion.div variants={reveal} className="mx-auto mt-10 max-w-xl rounded-lg border border-dashed border-slate-300 bg-white p-10 text-center"><Bell className="mx-auto text-sky-600" size={24} /><h3 className="mt-4 font-semibold text-slate-900">No announcements yet</h3><p className="mt-2 text-sm leading-6 text-slate-600">New library updates will appear here as soon as they are published.</p><Link to="/news" className="mt-5 inline-flex text-sm font-semibold text-sky-700 hover:text-sky-800">Visit news page <ArrowRight className="ml-1" size={16} /></Link></motion.div>}</motion.div></section>
+        <section id="news" className="border-y border-slate-200 bg-slate-50 px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="mx-auto max-w-7xl"><SectionIntro eyebrow="Latest news" title="Announcements and updates" description="Stay informed with library news, event highlights, and community alerts." />{newsLoading ? <div className="mt-10 grid gap-5 md:grid-cols-3">{[1, 2, 3].map((item) => <div key={item} className="h-56 animate-pulse rounded-3xl bg-slate-200" />)}</div> : <div className="mt-12 grid gap-5 lg:grid-cols-3">{displayNews.map((item, index) => <motion.article variants={reveal} whileHover={{ y: -5, scale: 1.01 }} key={item.newsId} className={`rounded-3xl border ${index === 0 ? 'border-slate-200' : 'border-slate-200/70'} bg-white p-6 shadow-sm transition duration-300 hover:shadow-lg`}><div className="flex items-center gap-2 text-sm font-semibold text-sky-700"><Bell size={16} />{String(item.newsId).startsWith('demo-') ? 'Library update' : 'Library announcement'}</div><h3 className="mt-5 text-xl font-semibold text-slate-950 leading-tight">{item.title}</h3><p className="mt-4 text-sm leading-7 text-slate-600 line-clamp-3">{item.description}</p><p className="mt-6 text-xs uppercase tracking-[0.24em] text-slate-400">{item.createdAt}</p></motion.article>)}</div>}{!newsLoading && <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-between"><p className="text-sm text-slate-500">Showing the latest library announcements and featured updates.</p><Link to="/news" className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Browse full news feed <ArrowRight size={16} /></Link></div>}</motion.div></section>
 
-        <section id="about" className="px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }}><SectionIntro eyebrow="About the project" title="A complete library platform, built for the real world" description="LibraryMS is a full-stack project that brings a responsive React interface together with a secure Spring Boot API and a PostgreSQL data layer." align="left" /><motion.div variants={reveal} className="mt-8 grid grid-cols-2 gap-3">{['Spring Boot API', 'React interface', 'PostgreSQL data', 'JWT Authentication', 'Responsive design', 'Role-based workflows'].map((item) => <div key={item} className="flex items-center gap-2 text-sm font-medium text-slate-700"><Check size={16} className="text-emerald-600" />{item}</div>)}</motion.div></motion.div><motion.aside initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-xl bg-sky-50 p-7 sm:p-9"><div className="flex items-center justify-between"><div className="rounded-lg bg-slate-950 p-3 text-white"><Layers3 size={22} /></div><span className="text-sm font-semibold text-sky-700">Portfolio project</span></div><h3 className="mt-8 text-2xl font-semibold text-slate-950">Built with care for a better library experience.</h3><p className="mt-4 leading-7 text-slate-600">The system combines thoughtful interface design with practical features for every member of the library ecosystem.</p></motion.aside></div></section>
+        <section id="about" className="px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }}><SectionIntro eyebrow="About the project" title="A complete library platform, built for the real world" description="LibraryMS is a full-stack project that brings a responsive React interface together with a secure Spring Boot API and a MySQL data layer." align="left" /><motion.div variants={reveal} className="mt-8 grid grid-cols-2 gap-3">{['Spring Boot API', 'React interface', 'MySQL data', 'JWT Authentication', 'Responsive design', 'Role-based workflows'].map((item) => <div key={item} className="flex items-center gap-2 text-sm font-medium text-slate-700"><Check size={16} className="text-emerald-600" />{item}</div>)}</motion.div></motion.div><motion.aside initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-xl bg-sky-50 p-7 sm:p-9"><div className="flex items-center justify-between"><div className="rounded-lg bg-slate-950 p-3 text-white"><Layers3 size={22} /></div><span className="text-sm font-semibold text-sky-700">Portfolio project</span></div><h3 className="mt-8 text-2xl font-semibold text-slate-950">Built with care for a better library experience.</h3><p className="mt-4 leading-7 text-slate-600">The system combines thoughtful interface design with practical features for every member of the library ecosystem.</p></motion.aside></div></section>
 
-        <section className="bg-slate-950 px-5 py-20 text-white sm:px-8 lg:px-10"><motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mx-auto flex max-w-7xl flex-col justify-between gap-8 rounded-xl border border-white/10 bg-white/5 p-7 sm:p-10 lg:flex-row lg:items-center"><div><p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-300">Developer</p><h2 className="mt-3 text-3xl font-semibold">Made for thoughtful library teams.</h2><p className="mt-3 max-w-xl leading-7 text-slate-300">Explore the project, connect with the developer, or request the full resume.</p></div><div className="flex flex-wrap gap-3"><a href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub" className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-slate-200 transition hover:bg-white/10"><Code2 size={18} /></a><a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-slate-200 transition hover:bg-white/10"><Users size={18} /></a><a href="mailto:developer@example.com" aria-label="Email developer" className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-slate-200 transition hover:bg-white/10"><Mail size={18} /></a><a href="#home" className="inline-flex h-10 items-center rounded-md bg-white px-4 text-sm font-semibold text-slate-950 transition hover:bg-sky-100">Resume</a></div></motion.div></section>
+        <section className="bg-slate-950 px-5 py-20 text-white sm:px-8 lg:px-10"><motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mx-auto flex max-w-7xl flex-col justify-between gap-8 rounded-xl border border-white/10 bg-white/5 p-7 sm:p-10 lg:flex-row lg:items-center"><div><p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-300">Developer</p><h2 className="mt-3 text-3xl font-semibold">Built by Lalit Gangwar.</h2><p className="mt-3 max-w-xl leading-7 text-slate-300">Full-stack Java &amp; React portfolio work with a focus on clean design, secure access, and scalable library operations.</p></div><div className="flex flex-wrap gap-3"><a href="https://github.com/lalitgangwar0812" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-slate-200 transition hover:bg-white/10"><FaGithub size={18} /></a><a href="https://www.linkedin.com/in/lalitgangwar0812/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-slate-200 transition hover:bg-white/10"><FaLinkedin size={18} /></a><a href="mailto:lalitgangwar0812@gmail.com" aria-label="Email developer" className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-slate-200 transition hover:bg-white/10"><Mail size={18} /></a><a href="https://drive.google.com/file/d/15b93KynKSwmL54HLQz_v1_TpKHNwq-DK/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="inline-flex h-10 items-center rounded-md bg-white px-4 text-sm font-semibold text-slate-950 transition hover:bg-sky-100">Resume</a></div></motion.div></section>
       </main>
 
-      <footer className="bg-slate-950 px-5 pb-8 sm:px-8 lg:px-10"><div className="mx-auto max-w-7xl border-t border-white/10 pt-8 text-sm text-slate-400"><div className="flex flex-col justify-between gap-6 sm:flex-row"><div><div className="flex items-center gap-2 font-semibold text-white"><BookOpen size={17} />LibraryMS</div><p className="mt-2">A smarter home for every library.</p></div><div className="flex flex-wrap gap-x-5 gap-y-2">{navLinks.map((item) => <a key={item.label} href={item.href} className="hover:text-white">{item.label}</a>)}<a href="mailto:developer@example.com" className="hover:text-white">Contact</a><a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-white">GitHub</a><a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-white">LinkedIn</a></div></div><p className="mt-8 border-t border-white/10 pt-6 text-xs text-slate-500">Copyright 2026 LibraryMS. All rights reserved.</p></div></footer>
+      <footer className="bg-slate-950 px-5 pb-8 sm:px-8 lg:px-10"><div className="mx-auto max-w-7xl border-t border-white/10 pt-8 text-sm text-slate-400"><div className="flex flex-col justify-between gap-6 sm:flex-row"><div><div className="flex items-center gap-2 font-semibold text-white"><BookOpen size={17} />LibraryMS</div><p className="mt-2">A smarter home for every library.</p></div><div className="flex flex-wrap gap-x-5 gap-y-2">{navLinks.map((item) => <a key={item.label} href={item.href} className="hover:text-white">{item.label}</a>)}<a href="mailto:lalitgangwar0812@gmail.com" className="hover:text-white">Contact</a><a href="https://github.com/lalitgangwar0812" target="_blank" rel="noreferrer" className="hover:text-white">GitHub</a><a href="https://www.linkedin.com/in/lalitgangwar0812/" target="_blank" rel="noreferrer" className="hover:text-white">LinkedIn</a></div></div><p className="mt-8 border-t border-white/10 pt-6 text-xs text-slate-500">Copyright 2026 LibraryMS. All rights reserved.</p></div></footer>
     </div>
   )
 }
