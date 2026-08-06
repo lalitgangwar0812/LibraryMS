@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Copy, LockKeyhole, Mail, ShieldCheck } from 'lucide-react'
+import { ArrowRight, BookOpen, Check, ChevronDown, Copy, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { useAuth } from '../../components/common/AuthContext'
+import AuthHeader from '../../components/layout/AuthHeader'
 
 const getDashboardPath = (role) => {
   switch (role?.toUpperCase()) {
@@ -25,6 +26,7 @@ function LoginPage() {
   const [errors, setErrors] = useState({})
   const [submitError, setSubmitError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [showDemoCredentials, setShowDemoCredentials] = useState(false)
   const [copied, setCopied] = useState('')
 
@@ -95,12 +97,7 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
-        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
-          <Link to="/" className="flex items-center gap-2 font-semibold text-slate-950"><span className="grid h-9 w-9 place-items-center rounded-lg bg-slate-950 text-white"><BookOpen size={18} /></span>LibraryMS</Link>
-          <Link to="/" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-sky-700"><ArrowLeft size={16} />Home</Link>
-        </nav>
-      </header>
+      <AuthHeader />
       <main className="relative overflow-hidden px-5 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:48px_48px]" />
         <div className="relative mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
@@ -148,12 +145,20 @@ function LoginPage() {
                 <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(event) => setFormData({ ...formData, password: event.target.value })}
-                  className={`w-full rounded-xl border bg-white py-3 pl-10 pr-3 text-sm outline-none transition ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-sky-500'}`}
+                  className={`w-full rounded-xl border bg-white py-3 pl-10 pr-12 text-sm outline-none transition ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-sky-500'}`}
                   placeholder="Enter your password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((value) => !value)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-600"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
               {errors.password ? <p className="mt-2 text-sm text-red-500" role="alert">{errors.password}</p> : null}
             </div>
@@ -212,7 +217,6 @@ function LoginPage() {
               </div>
             ) : null}
           </div>
-          <Link to="/" className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-sky-700"><ArrowLeft size={16} />Back to Home</Link>
         </section>
         </div>
       </main>
