@@ -54,7 +54,7 @@ public class FeedbackService {
             Integer rating) {
 
         String normalizedSearch = (search == null || search.isBlank())
-                ? null
+                ? ""
                 : search.trim();
 
         return feedbackRepository.searchByRatingAndSearch(

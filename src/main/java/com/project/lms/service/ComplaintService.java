@@ -82,7 +82,7 @@ public class ComplaintService {
         }
 
         String normalizedSearch = (search == null || search.isBlank())
-                ? null
+                ? ""
                 : search.trim();
 
         return complaintRepository.searchByStatusAndSearch(

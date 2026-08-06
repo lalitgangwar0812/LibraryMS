@@ -17,10 +17,16 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
     List<Feedback> findByRating(Integer rating);
 
     // Search by rating and student name
-    @Query("SELECT f FROM Feedback f WHERE " +
-            "(:rating IS NULL OR f.rating = :rating) AND " +
-            "(:search IS NULL OR lower(f.user.fullName) LIKE lower(concat('%', :search, '%'))) " +
-            "ORDER BY f.createdAt DESC")
+    @Query("""
+            SELECT f
+            FROM Feedback f
+            WHERE (:rating IS NULL OR f.rating = :rating)
+              AND (
+                    :search = ''
+                    OR LOWER(f.user.fullName) LIKE LOWER(CONCAT('%', :search, '%'))
+              )
+            ORDER BY f.createdAt DESC
+            """)
     List<Feedback> searchByRatingAndSearch(
             @Param("rating") Integer rating,
             @Param("search") String search);

@@ -37,7 +37,7 @@ public class AdminLibrarianService {
 
     @Transactional(readOnly = true)
     public Page<LibrarianResponse> getLibrarians(String search, Pageable pageable) {
-        String term = search == null || search.isBlank() ? null : search.trim();
+        String term = search == null || search.isBlank() ? "" : search.trim();
         return userRepository.searchByRole(Role.LIBRARIAN, term, pageable)
                 .map(this::mapToResponse);
     }

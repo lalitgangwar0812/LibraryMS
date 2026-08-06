@@ -1,13 +1,14 @@
-# Library Management System
+# LibraryMS – Library Management System
 
 ![Java](https://img.shields.io/badge/Java-17-007396?logo=openjdk&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F?logo=springboot&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
-![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![GitHub repo size](https://img.shields.io/github/repo-size/lalitgangwar0812/library-management-system)
 
-A full-stack Library Management System built with Java 17, Spring Boot 3.5, React 19, Vite 8, Tailwind CSS 4, and MySQL. The application provides role-based dashboards for administrators, librarians, students, and public users while supporting book management, circulation, announcements, complaints, and feedback.
+LibraryMS is a full-stack Library Management System built with Java 17, JavaScript (ES6+), Spring Boot 3.5, React 19, Vite 8, Tailwind CSS 4, and PostgreSQL. The application provides role-based dashboards for administrators, librarians, students, and public users while supporting book management, circulation, announcements, enquiries, complaints, and feedback.
 
 ---
 
@@ -19,11 +20,11 @@ A full-stack Library Management System built with Java 17, Spring Boot 3.5, Reac
 
 ## Overview
 
-This project was developed to demonstrate a complete library management workflow using a modern Java backend and a React frontend.
+This project, **LibraryMS**, was developed to demonstrate a complete library management workflow using a modern Java backend and a React frontend.
 
 The application supports three authenticated roles—Administrator, Librarian, and Student—each with its own dashboard and permissions. Public visitors can browse the landing page, register as students, and read published announcements without signing in.
 
-The system manages books, categories, borrowing records, announcements, complaints, and feedback while using JWT-based authentication and role-based authorization.
+The system manages books, categories, borrowing records, announcements, enquiries, complaints, and feedback while using JWT-based authentication and role-based authorization.
 
 ---
 
@@ -45,8 +46,9 @@ The system manages books, categories, borrowing records, announcements, complain
 - Manage Students
 - Manage Book Issues
 - Publish News
-- View Complaints
-- View Feedback
+- Manage Complaints
+- Manage Enquiries
+- Manage Feedback
 
 ### Librarian
 
@@ -62,6 +64,8 @@ The system manages books, categories, borrowing records, announcements, complain
 - Browse Books
 - Search Books
 - View Issue History
+- Submit Enquiries
+- Track Enquiry Status
 - Submit Complaints
 - Submit Feedback
 - Read News
@@ -83,6 +87,7 @@ The system manages books, categories, borrowing records, announcements, complain
 - Category Management
 - Book Issue & Return Management
 - News Management
+- Enquiry Management
 - Complaint Management
 - Feedback Management
 
@@ -90,19 +95,32 @@ The system manages books, categories, borrowing records, announcements, complain
 
 ## Technology Stack
 
-| Layer             | Technology                     |
-|-------------------|--------------------------------|
-| Language          | Java 17                        |
-| Backend           | Spring Boot 3.5                |
-| Frontend          | React 19 + Vite 8              |
-| Styling           | Tailwind CSS 4                 |
-| Database          | MySQL                          |
-| Security          | Spring Security, JWT, BCrypt   |
-| ORM               | Spring Data JPA / Hibernate    |
-| API Documentation | Swagger UI (OpenAPI 3)         |
-| Build Tools       | Maven 3.9, npm 10              |
-| HTTP Client       | Axios 1                        |
-| Routing           | React Router 7                 |
+| Layer | Technology |
+|--------|------------|
+| Language | Java 17, JavaScript (ES6+) |
+| Backend | Spring Boot 3.5 |
+| Frontend | React 19 + Vite 8 |
+| Styling | Tailwind CSS 4 |
+| Database | PostgreSQL |
+| Security | Spring Security, JWT, BCrypt |
+| ORM | Spring Data JPA / Hibernate |
+| API Documentation | Swagger UI (OpenAPI 3) |
+| Build Tools | Maven 3.9, npm 10 |
+| HTTP Client | Axios 1 |
+| Routing | React Router 7 |
+
+---
+
+## Database Setup
+
+### PostgreSQL
+
+The project uses **PostgreSQL** as its primary relational database.
+
+- Create an empty PostgreSQL database.
+- Import the sample dataset from `docs/postgres-demo-data.sql`.
+- Update the database connection details in `src/main/resources/application.properties`.
+- Spring Boot and Hibernate automatically manage schema updates during local development using the configured JPA settings.
 
 ---
 
@@ -110,9 +128,9 @@ The system manages books, categories, borrowing records, announcements, complain
 
 The project follows a client-server architecture.
 
-- **Frontend:** React 19 + Vite 8 application responsible for the user interface.
+- **Frontend:** React 19 + JavaScript (ES6+) + Vite 8 application responsible for the user interface.
 - **Backend:** Spring Boot 3.5 REST API handling authentication, business logic, and database operations.
-- **Database:** MySQL for persistent data storage.
+- **Database:** PostgreSQL for persistent data storage.
 - **Authentication:** JWT-based authentication with Spring Security and BCrypt password hashing.
 - **API Communication:** Axios is used by the frontend to communicate with the backend REST APIs.
 
@@ -183,11 +201,15 @@ docs/
 
 ![Feedback](docs/screenshots/Feedback.png)
 
+### Enquiry
+
+![Enquiry](docs/screenshots/Enquiry1.png)
+
 ---
 
 ## Database
 
-The application uses **MySQL** as its relational database.
+The application uses **PostgreSQL** as its recommended relational database.
 
 Database operations are handled using **Spring Data JPA** and **Hibernate**, allowing the application to interact with the database through entity classes and repositories.
 
@@ -212,13 +234,19 @@ git clone https://github.com/lalitgangwar0812/library-management-system.git
 cd library-management-system
 ```
 
-### 2. Create a MySQL Database
+### 2. Create a PostgreSQL Database
 
-Create an empty MySQL database.
+Create an empty PostgreSQL database.
 
 ### 3. Import Demo Data
 
 Import the sample dataset located at:
+
+```text
+docs/postgres-demo-data.sql
+```
+
+If you want to explore the optional MySQL dataset, the optional sample dataset is available at:
 
 ```text
 docs/mysql-demo-data.sql
@@ -254,7 +282,9 @@ Open the URL displayed by Vite (typically `http://localhost:5173`).
 
 ## Demo Data
 
-The repository includes a sample MySQL dataset (`docs/mysql-demo-data.sql`) that populates the application with realistic records, allowing the system to be explored immediately after setup.
+The repository includes a sample PostgreSQL dataset (`docs/postgres-demo-data.sql`) that populates the application with realistic records, allowing the system to be explored immediately after setup.
+
+For optional MySQL compatibility, a sample MySQL dataset is also included at `docs/mysql-demo-data.sql`.
 
 The demo data includes:
 
@@ -265,6 +295,7 @@ The demo data includes:
 - Book catalog
 - Book issue records
 - Published news
+- Enquiries
 - Complaints
 - Feedback
 
@@ -286,9 +317,9 @@ The demo data includes:
 - Book reservation system
 - Email notifications
 - Barcode / QR code support
-- Docker support
-- PostgreSQL support
-- Cloud deployment
+- Docker containerization
+- Advanced reporting & analytics
+- Production cloud deployment
 
 ---
 

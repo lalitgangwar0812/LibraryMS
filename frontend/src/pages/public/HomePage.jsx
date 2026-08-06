@@ -1,12 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight, Bell, BookOpen, BookOpenCheck, ChartNoAxesCombined, Check,
   GraduationCap, Layers3, LibraryBig, Mail, Menu, Search, ShieldCheck, Sparkles, X,
   UserRoundCog,
 } from 'lucide-react'
-import { FaGithub, FaLinkedin } from 'react-icons/fa'
+import { FaGithub, FaLinkedin, FaJava } from 'react-icons/fa'
+import {
+  SiSpringboot,
+  SiSpringsecurity,
+  SiJavascript,
+  SiJsonwebtokens,
+  SiPostgresql,
+  SiReact,
+  SiVite,
+  SiTailwindcss,
+} from 'react-icons/si'
 import api from '../../components/common/api'
 
 const reveal = {
@@ -20,7 +30,17 @@ const features = [
   { icon: Bell, title: 'Smart Notifications', description: 'Keep readers current on due dates, returns, and library announcements.' },
 ]
 
-const technology = ['Java', 'Spring Boot', 'Spring Security', 'JWT', 'MySQL', 'React', 'Vite', 'Tailwind CSS']
+const technology = [
+  { icon: FaJava, label: 'Java', color: '#007396', glowColor: 'from-blue-500/40 to-blue-600/40' },
+  { icon: SiJavascript, label: 'JavaScript', color: '#F7DF1E', glowColor: 'from-yellow-400/40 to-amber-500/40' },
+  { icon: SiSpringboot, label: 'Spring Boot', color: '#6DB33F', glowColor: 'from-green-500/40 to-green-600/40' },
+  { icon: SiSpringsecurity, label: 'Spring Security', color: '#6DB33F', glowColor: 'from-green-500/40 to-green-600/40' },
+  { icon: SiJsonwebtokens, label: 'JWT', color: '#0EA5E9', glowColor: 'from-cyan-500/40 to-blue-600/40' },
+  { icon: SiPostgresql, label: 'PostgreSQL', color: '#336791', glowColor: 'from-blue-500/40 to-indigo-600/40' },
+  { icon: SiReact, label: 'React', color: '#61DAFB', glowColor: 'from-cyan-400/40 to-blue-500/40' },
+  { icon: SiVite, label: 'Vite', color: '#FDD600', glowColor: 'from-yellow-400/40 to-amber-500/40' },
+  { icon: SiTailwindcss, label: 'Tailwind CSS', color: '#0EA5E9', glowColor: 'from-cyan-500/40 to-blue-500/40' },
+]
 
 const roles = [
   { icon: UserRoundCog, title: 'Admin', description: 'Oversee people, inventory, announcements, reports, and library operations.', accent: 'bg-violet-100 text-violet-700' },
@@ -102,25 +122,47 @@ function DashboardPreview() {
 function HomePage() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [navVisible, setNavVisible] = useState(true)
   const [news, setNews] = useState([])
   const [newsLoading, setNewsLoading] = useState(true)
+  const [newsError, setNewsError] = useState('')
+  const lastScrollY = useRef(0)
+  const shouldReduceMotion = useReducedMotion()
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12)
+    const onScroll = () => {
+      const currentScrollY = window.scrollY
+      setScrolled(currentScrollY > 12)
+
+      if (currentScrollY <= 12 || currentScrollY < lastScrollY.current || open) {
+        setNavVisible(true)
+      } else if (currentScrollY > lastScrollY.current) {
+        setNavVisible(false)
+      }
+
+      lastScrollY.current = currentScrollY
+    }
+
     window.addEventListener('scroll', onScroll)
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [open])
+
+  useEffect(() => {
     const loadNews = async () => {
       try {
+        setNewsError('')
         const response = await api.get('/news')
         const allNews = response.data || []
         setNews(Array.isArray(allNews) ? allNews.slice(0, 3) : [])
-      } catch {
+      } catch (error) {
         setNews([])
+        setNewsError(error?.response?.data?.message || 'Unable to load the latest news.')
       } finally {
         setNewsLoading(false)
       }
     }
     loadNews()
-    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   const closeMenu = () => setOpen(false)
@@ -129,7 +171,7 @@ function HomePage() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-white text-slate-900">
-      <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? 'border-b border-slate-200/80 bg-white/85 py-2 shadow-sm backdrop-blur-xl' : 'bg-transparent py-4'}`}>
+      <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${navVisible ? 'translate-y-0' : '-translate-y-full'} ${scrolled ? 'border-b border-slate-200/80 bg-white/85 py-2 shadow-sm backdrop-blur-xl' : 'bg-transparent py-4'}`}>
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
           <a href="#home" className="flex items-center gap-2 font-semibold text-slate-950"><span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-950 text-white"><BookOpen size={18} /></span>LibraryMS</a>
           <div className="hidden items-center gap-6 lg:flex">{navLinks.map((item) => <a key={item.label} href={item.href} className="text-sm font-medium text-slate-600 transition hover:text-slate-950">{item.label}</a>)}<Link to="/login" className="text-sm font-medium text-slate-600 transition hover:text-slate-950">Login</Link><Link to="/register" className="text-sm font-medium text-slate-600 transition hover:text-slate-950">Register</Link></div>
@@ -155,17 +197,59 @@ function HomePage() {
 
         <motion.section id="features" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={{ visible: { transition: { staggerChildren: 0.12 } } }} className="px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><div className="mx-auto max-w-7xl"><SectionIntro eyebrow="Features" title="Everything your library needs, in one place" description="A polished workflow for catalog discovery, circulation, communication, and day-to-day management." /><div className="mt-12 grid gap-5 md:grid-cols-3">{features.map(({ icon: Icon, title, description }) => <motion.article variants={reveal} whileHover={{ y: -6 }} key={title} className="group rounded-lg border border-slate-200 bg-white p-7 shadow-sm transition-shadow hover:border-sky-200 hover:shadow-lg hover:shadow-sky-100/60"><div className="mb-5 inline-flex rounded-lg bg-sky-50 p-3 text-sky-700 transition group-hover:bg-sky-600 group-hover:text-white"><Icon size={22} /></div><h3 className="text-xl font-semibold text-slate-950">{title}</h3><p className="mt-3 leading-7 text-slate-600">{description}</p></motion.article>)}</div></div></motion.section>
 
-        <section id="technology" className="border-y border-slate-200 bg-slate-950 px-5 py-20 text-white sm:px-8 lg:px-10"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.08 } } }} className="mx-auto max-w-7xl"><SectionIntro inverted eyebrow="Technology" title="Built on a reliable full-stack foundation" description="A practical, modern stack designed for security, speed, and maintainability." /><div className="mt-10 flex flex-wrap justify-center gap-3">{technology.map((item, index) => <motion.div variants={reveal} whileHover={{ scale: 1.05, y: -2 }} key={item} className="flex items-center gap-2 rounded-md border border-white/15 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200"><span className={`h-2 w-2 rounded-full ${['bg-orange-400', 'bg-emerald-400', 'bg-sky-400', 'bg-amber-400'][index % 4]}`} />{item}</motion.div>)}</div></motion.div></section>
+        <section id="technology" className="border-y border-slate-200 bg-slate-950 px-5 py-20 text-white sm:px-8 lg:px-10"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.08 } } }} className="mx-auto max-w-7xl"><SectionIntro inverted eyebrow="Technology" title="Built on a reliable full-stack foundation" description="A practical, modern stack designed for security, speed, and maintainability." /><div className="mt-10 flex flex-wrap justify-center gap-4 lg:gap-5 xl:gap-2">{technology.map(({ icon: Icon, label, color, glowColor }, index) => {
+  const floatDelay = index * 0.15
+  return (
+    <motion.div
+      key={label}
+      variants={{
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+      }}
+      whileHover={{ scale: 1.03, y: -6, transition: { duration: 0.25 } }}
+      className="group relative"
+    >
+      <motion.div
+        animate={{ y: [0, -3, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: floatDelay }}
+        className="relative flex items-center gap-3 rounded-lg border border-white/15 bg-gradient-to-br from-white/[0.08] to-white/[0.03] px-5 py-3.5 transition-all duration-300 group-hover:border-white/30 xl:gap-2 xl:px-3"
+      >
+        <div
+          className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(circle at 50% 50%, ${color}20 0%, transparent 70%)`,
+          }}
+        />
+        <motion.div
+          animate={{ y: [0, -2, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: floatDelay }}
+          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-slate-950/50 transition-all duration-300 group-hover:border-white/40 group-hover:scale-110"
+          style={{ color }}
+        >
+          <Icon size={16} />
+        </motion.div>
+        <span className="relative z-10 text-sm font-medium text-slate-100 group-hover:text-white transition-colors duration-300">{label}</span>
+
+        <div
+          className="absolute inset-0 rounded-lg opacity-0 blur-xl group-hover:opacity-50 transition-opacity duration-300 -z-10 group-hover:-z-0"
+          style={{
+            background: `radial-gradient(circle at 50% 50%, ${color}40 0%, transparent 70%)`,
+          }}
+        />
+      </motion.div>
+    </motion.div>
+  )
+})}</div></motion.div></section>
 
         <motion.section initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><div className="mx-auto max-w-7xl"><SectionIntro eyebrow="For every role" title="A workspace that adapts to your team" description="Purposeful tools give each person the right view and the right controls." /><div className="mt-12 grid gap-5 md:grid-cols-3">{roles.map(({ icon: Icon, title, description, accent }) => <motion.article variants={reveal} whileHover={{ y: -5 }} key={title} className="rounded-lg border border-slate-200 bg-white p-7 shadow-sm transition-shadow hover:shadow-lg"><div className={`inline-flex rounded-lg p-3 ${accent}`}><Icon size={22} /></div><h3 className="mt-5 text-xl font-semibold text-slate-950">{title}</h3><p className="mt-3 leading-7 text-slate-600">{description}</p><div className="mt-5 flex items-center gap-2 text-sm font-semibold text-slate-800"><Check size={15} className="text-emerald-600" />Role-specific dashboard</div></motion.article>)}</div></div></motion.section>
 
         <section className="bg-slate-50 px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.08 } } }} className="mx-auto max-w-7xl"><SectionIntro eyebrow="Why LibraryMS" title="Designed around the library work that matters" description="Thoughtful tools remove routine friction and make every interaction easier to manage." /><div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{reasons.map(({ icon: Icon, text }) => <motion.div variants={reveal} whileHover={{ y: -3 }} key={text} className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm"><span className="rounded-md bg-sky-50 p-2 text-sky-700"><Icon size={17} /></span><span className="text-sm font-semibold text-slate-800">{text}</span></motion.div>)}</div></motion.div></section>
 
-        <motion.section initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="px-5 py-20 sm:px-8 lg:px-10"><div className="mx-auto grid max-w-7xl gap-10 rounded-xl bg-slate-950 px-7 py-10 text-white lg:grid-cols-[0.7fr_1.3fr] lg:items-center lg:px-12"><SectionIntro inverted eyebrow="By the numbers" title="A dashboard made for momentum" description="Monitor the activity that keeps your library community thriving." align="left" /><div className="grid grid-cols-2 gap-4 sm:grid-cols-4">{counters.map((stat) => <motion.div variants={reveal} key={stat.label} className="border-l border-white/15 pl-4"><p className="text-2xl font-semibold sm:text-3xl">{stat.value}</p><p className="mt-1 text-sm text-slate-400">{stat.label}</p></motion.div>)}</div></div></motion.section>
+        <section className="px-5 py-20 sm:px-8 lg:px-10"><div className="mx-auto grid max-w-7xl gap-10 rounded-xl bg-slate-950 px-7 py-10 text-white lg:grid-cols-[0.7fr_1.3fr] lg:items-center lg:px-12"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }}><SectionIntro inverted eyebrow="By the numbers" title="A dashboard made for momentum" description="Monitor the activity that keeps your library community thriving." align="left" /></motion.div><div className="grid grid-cols-2 gap-4 sm:grid-cols-4">{counters.map((stat, index) => <motion.div initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.6 }} variants={{ hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 }, visible: { opacity: 1, y: 0, transition: { duration: shouldReduceMotion ? 0 : 0.5, delay: shouldReduceMotion ? 0 : index * 0.1 } } }} key={stat.label} className="border-l border-white/15 pl-4"><p className="text-2xl font-semibold sm:text-3xl">{stat.value}</p><p className="mt-1 text-sm text-slate-400">{stat.label}</p></motion.div>)}</div></div></section>
 
-        <section id="news" className="border-y border-slate-200 bg-slate-50 px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="mx-auto max-w-7xl"><SectionIntro eyebrow="Latest news" title="Announcements and updates" description="Stay informed with library news, event highlights, and community alerts." />{newsLoading ? <div className="mt-10 grid gap-5 md:grid-cols-3">{[1, 2, 3].map((item) => <div key={item} className="h-56 animate-pulse rounded-3xl bg-slate-200" />)}</div> : <div className="mt-12 grid gap-5 lg:grid-cols-3">{displayNews.map((item, index) => <motion.article variants={reveal} whileHover={{ y: -5, scale: 1.01 }} key={item.newsId} className={`rounded-3xl border ${index === 0 ? 'border-slate-200' : 'border-slate-200/70'} bg-white p-6 shadow-sm transition duration-300 hover:shadow-lg`}><div className="flex items-center gap-2 text-sm font-semibold text-sky-700"><Bell size={16} />{String(item.newsId).startsWith('demo-') ? 'Library update' : 'Library announcement'}</div><h3 className="mt-5 text-xl font-semibold text-slate-950 leading-tight">{item.title}</h3><p className="mt-4 text-sm leading-7 text-slate-600 line-clamp-3">{item.description}</p><p className="mt-6 text-xs uppercase tracking-[0.24em] text-slate-400">{item.createdAt}</p></motion.article>)}</div>}{!newsLoading && <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-between"><p className="text-sm text-slate-500">Showing the latest library announcements and featured updates.</p><Link to="/news" className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Browse full news feed <ArrowRight size={16} /></Link></div>}</motion.div></section>
+        <section id="news" className="border-y border-slate-200 bg-slate-50 px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }} className="mx-auto max-w-7xl"><SectionIntro eyebrow="Latest news" title="Announcements and updates" description="Stay informed with library news, event highlights, and community alerts." />{newsLoading ? <div className="mt-10 grid gap-5 md:grid-cols-3">{[1, 2, 3].map((item) => <div key={item} className="h-56 animate-pulse rounded-3xl bg-slate-200" />)}</div> : newsError ? <div className="mt-10 rounded-3xl border border-red-200 bg-red-50 p-6 text-sm text-red-700">{newsError}</div> : <div className="mt-12 grid gap-5 lg:grid-cols-3">{displayNews.map((item, index) => <motion.article initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: shouldReduceMotion ? 0 : 0.5, delay: shouldReduceMotion ? 0 : index * 0.1 }} whileHover={shouldReduceMotion ? undefined : { y: -5, scale: 1.01 }} key={item.newsId} className={`rounded-3xl border ${index === 0 ? 'border-slate-200' : 'border-slate-200/70'} bg-white p-6 shadow-sm transition duration-300 hover:shadow-lg`}><div className="flex items-center gap-2 text-sm font-semibold text-sky-700"><Bell size={16} />{String(item.newsId).startsWith('demo-') ? 'Library update' : 'Library announcement'}</div><h3 className="mt-5 text-xl font-semibold text-slate-950 leading-tight">{item.title}</h3><p className="mt-4 text-sm leading-7 text-slate-600 line-clamp-3">{item.description}</p><p className="mt-6 text-xs uppercase tracking-[0.24em] text-slate-400">{item.createdAt}</p></motion.article>)}</div>}{!newsLoading && <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-between"><p className="text-sm text-slate-500">{newsError ? 'Please try again later for the latest library announcements.' : 'Showing the latest library announcements and featured updates.'}</p><Link to="/news" className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Browse full news feed <ArrowRight size={16} /></Link></div>}</motion.div></section>
 
-        <section id="about" className="px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }}><SectionIntro eyebrow="About the project" title="A complete library platform, built for the real world" description="LibraryMS is a full-stack project that brings a responsive React interface together with a secure Spring Boot API and a MySQL data layer." align="left" /><motion.div variants={reveal} className="mt-8 grid grid-cols-2 gap-3">{['Spring Boot API', 'React interface', 'MySQL data', 'JWT Authentication', 'Responsive design', 'Role-based workflows'].map((item) => <div key={item} className="flex items-center gap-2 text-sm font-medium text-slate-700"><Check size={16} className="text-emerald-600" />{item}</div>)}</motion.div></motion.div><motion.aside initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-xl bg-sky-50 p-7 sm:p-9"><div className="flex items-center justify-between"><div className="rounded-lg bg-slate-950 p-3 text-white"><Layers3 size={22} /></div><span className="text-sm font-semibold text-sky-700">Portfolio project</span></div><h3 className="mt-8 text-2xl font-semibold text-slate-950">Built with care for a better library experience.</h3><p className="mt-4 leading-7 text-slate-600">The system combines thoughtful interface design with practical features for every member of the library ecosystem.</p></motion.aside></div></section>
+        <section id="about" className="px-5 py-20 sm:px-8 lg:px-10 lg:py-28"><div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={{ visible: { transition: { staggerChildren: 0.1 } } }}><SectionIntro eyebrow="About the project" title="A complete library platform, built for the real world" description="LibraryMS is a full-stack project that brings a responsive React interface together with a secure Spring Boot API and a PostgreSQL data layer." align="left" /><motion.div variants={reveal} className="mt-8 grid grid-cols-2 gap-3">{['Spring Boot API', 'React interface', 'PostgreSQL data', 'JWT Authentication', 'Responsive design', 'Role-based workflows'].map((item) => <div key={item} className="flex items-center gap-2 text-sm font-medium text-slate-700"><Check size={16} className="text-emerald-600" />{item}</div>)}</motion.div></motion.div><motion.aside initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-xl bg-sky-50 p-7 sm:p-9"><div className="flex items-center justify-between"><div className="rounded-lg bg-slate-950 p-3 text-white"><Layers3 size={22} /></div><span className="text-sm font-semibold text-sky-700">Portfolio project</span></div><h3 className="mt-8 text-2xl font-semibold text-slate-950">Built with care for a better library experience.</h3><p className="mt-4 leading-7 text-slate-600">The system combines thoughtful interface design with practical features for every member of the library ecosystem.</p></motion.aside></div></section>
 
         <section className="bg-slate-950 px-5 py-20 text-white sm:px-8 lg:px-10"><motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mx-auto flex max-w-7xl flex-col justify-between gap-8 rounded-xl border border-white/10 bg-white/5 p-7 sm:p-10 lg:flex-row lg:items-center"><div><p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-300">Developer</p><h2 className="mt-3 text-3xl font-semibold">Built by Lalit Gangwar.</h2><p className="mt-3 max-w-xl leading-7 text-slate-300">Full-stack Java &amp; React portfolio work with a focus on clean design, secure access, and scalable library operations.</p></div><div className="flex flex-wrap gap-3"><a href="https://github.com/lalitgangwar0812" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-slate-200 transition hover:bg-white/10"><FaGithub size={18} /></a><a href="https://www.linkedin.com/in/lalitgangwar0812/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-slate-200 transition hover:bg-white/10"><FaLinkedin size={18} /></a><a href="mailto:lalitgangwar0812@gmail.com" aria-label="Email developer" className="grid h-10 w-10 place-items-center rounded-md border border-white/15 text-slate-200 transition hover:bg-white/10"><Mail size={18} /></a><a href="https://drive.google.com/file/d/15b93KynKSwmL54HLQz_v1_TpKHNwq-DK/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="inline-flex h-10 items-center rounded-md bg-white px-4 text-sm font-semibold text-slate-950 transition hover:bg-sky-100">Resume</a></div></motion.div></section>
       </main>

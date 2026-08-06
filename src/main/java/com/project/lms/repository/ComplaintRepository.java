@@ -21,11 +21,17 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Integer> {
     List<Complaint> findByStatusOrderByCreatedAtDesc(ComplaintStatus status);
 
     // Search by status and subject or student name
-    @Query("SELECT c FROM Complaint c WHERE " +
-            "(:status IS NULL OR c.status = :status) AND " +
-            "(:search IS NULL OR lower(c.subject) LIKE lower(concat('%', :search, '%')) " +
-            "OR lower(c.user.fullName) LIKE lower(concat('%', :search, '%'))) " +
-            "ORDER BY c.createdAt DESC")
+    @Query("""
+            SELECT c
+            FROM Complaint c
+            WHERE (:status IS NULL OR c.status = :status)
+              AND (
+                    :search = ''
+                    OR LOWER(c.subject) LIKE LOWER(CONCAT('%', :search, '%'))
+                    OR LOWER(c.user.fullName) LIKE LOWER(CONCAT('%', :search, '%'))
+              )
+            ORDER BY c.createdAt DESC
+            """)
     List<Complaint> searchByStatusAndSearch(
             @Param("status") ComplaintStatus status,
             @Param("search") String search);

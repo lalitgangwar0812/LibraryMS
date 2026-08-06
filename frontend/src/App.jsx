@@ -15,6 +15,7 @@ import StudentsPage from './pages/admin/students/StudentsPage'
 import LibrariansPage from './pages/admin/librarians/LibrariansPage'
 import IssuesPage from './pages/admin/issues/IssuesPage'
 import ComplaintsPage from './pages/admin/complaints/ComplaintsPage'
+import EnquiriesPage from './pages/admin/enquiries/EnquiriesPage'
 import FeedbackPage from './pages/admin/feedback/FeedbackPage'
 import NewsPage from './pages/admin/news/NewsPage'
 import ReportsPage from './pages/admin/reports/ReportsPage'
@@ -27,6 +28,7 @@ import StudentIssuedBooksPage from './pages/protected/StudentIssuedBooksPage'
 import StudentBorrowHistoryPage from './pages/protected/StudentBorrowHistoryPage'
 import StudentNewsPage from './pages/protected/StudentNewsPage'
 import StudentComplaintsPage from './pages/protected/StudentComplaintsPage'
+import StudentEnquiriesPage from './pages/protected/StudentEnquiriesPage'
 import StudentFeedbackPage from './pages/protected/StudentFeedbackPage'
 import StudentProfilePage from './pages/protected/StudentProfilePage'
 
@@ -93,6 +95,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
                 <ComplaintsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/enquiries"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <EnquiriesPage />
               </ProtectedRoute>
             }
           />
@@ -215,6 +225,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['STUDENT']}>
                 <StudentComplaintsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student/enquiries"
+            element={
+              <ProtectedRoute allowedRoles={['STUDENT']}>
+                <StudentEnquiriesPage />
               </ProtectedRoute>
             }
           />

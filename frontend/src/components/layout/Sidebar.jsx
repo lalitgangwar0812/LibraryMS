@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { BookOpen, BookText, BriefcaseBusiness, LayoutDashboard, MessageSquareText, Newspaper, Sparkles, Users, UserRoundCog, ClipboardList, UserCircle2, X } from 'lucide-react'
+import { BookOpen, BookText, BriefcaseBusiness, LayoutDashboard, MessageSquare, MessageSquareText, Newspaper, Sparkles, Users, UserRoundCog, ClipboardList, UserCircle2, X } from 'lucide-react'
 import { useAuth } from '../common/AuthContext'
 
 const adminMenuItems = [
@@ -10,6 +10,7 @@ const adminMenuItems = [
   { label: 'Librarians', to: '/admin/librarians', icon: UserRoundCog },
   { label: 'Book Issues', to: '/admin/issues', icon: ClipboardList },
   { label: 'Complaints', to: '/admin/complaints', icon: MessageSquareText },
+  { label: 'Enquiries', to: '/admin/enquiries', icon: MessageSquare },
   { label: 'Feedback', to: '/admin/feedback', icon: Sparkles },
   { label: 'News', to: '/admin/news', icon: Newspaper },
   { label: 'Reports', to: '/admin/reports', icon: BriefcaseBusiness },
@@ -22,6 +23,7 @@ const studentMenuItems = [
   { label: 'Borrow History', to: '/student/borrow-history', icon: BookOpen },
   { label: 'News', to: '/student/news', icon: Newspaper },
   { label: 'Complaints', to: '/student/complaints', icon: MessageSquareText },
+  { label: 'My Enquiries', to: '/student/enquiries', icon: MessageSquare },
   { label: 'Feedback', to: '/student/feedback', icon: Sparkles },
   { label: 'Profile', to: '/student/profile', icon: UserCircle2 },
 ]
