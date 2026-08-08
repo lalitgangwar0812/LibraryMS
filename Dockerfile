@@ -23,4 +23,4 @@ COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java","-XX:InitialRAMPercentage=20","-XX:MaxRAMPercentage=70","-jar","app.jar"]
+ENTRYPOINT ["java","-Xms64m","-Xmx256m","-XX:MaxMetaspaceSize=128m","-XX:ReservedCodeCacheSize=64m","-Xss512k","-XX:MaxDirectMemorySize=32m","-jar","app.jar"]
