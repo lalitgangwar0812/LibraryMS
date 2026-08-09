@@ -34,6 +34,7 @@ public class BookService {
     }
 
     // Create Book
+    @Transactional
     public BookResponse createBook(BookRequest request) {
 
         if (bookRepository.existsByIsbn(request.getIsbn())) {
@@ -60,6 +61,7 @@ public class BookService {
     }
 
     // Get All Books
+    @Transactional(readOnly = true)
     public List<BookResponse> getAllBooks() {
 
         return bookRepository.findAll()
@@ -69,6 +71,7 @@ public class BookService {
     }
 
     // Get Book By ID
+    @Transactional(readOnly = true)
     public BookResponse getBookById(Integer id) {
 
         Book book = bookRepository.findById(id)
@@ -134,6 +137,7 @@ public class BookService {
     }
 
     // Search By Title
+    @Transactional(readOnly = true)
     public List<BookResponse> searchByTitle(String title) {
 
         return bookRepository.findByTitleContainingIgnoreCase(title)
@@ -143,6 +147,7 @@ public class BookService {
     }
 
     // Search By Author
+    @Transactional(readOnly = true)
     public List<BookResponse> searchByAuthor(String author) {
 
         return bookRepository.findByAuthorContainingIgnoreCase(author)
@@ -152,6 +157,7 @@ public class BookService {
     }
 
     // Search By Category
+    @Transactional(readOnly = true)
     public List<BookResponse> getBooksByCategory(Integer categoryId) {
 
         return bookRepository.findByCategory_CategoryId(categoryId)

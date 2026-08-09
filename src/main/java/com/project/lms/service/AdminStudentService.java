@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.lms.dto.BookIssueResponse;
 import com.project.lms.dto.StudentResponse;
@@ -32,6 +33,7 @@ public class AdminStudentService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
     public List<StudentResponse> getStudents(String search) {
 
         List<User> students = userRepository.findByRole(Role.STUDENT);
@@ -50,6 +52,7 @@ public class AdminStudentService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
     public StudentResponse getStudent(Integer studentId) {
 
         User student = userRepository.findById(studentId)
@@ -63,6 +66,7 @@ public class AdminStudentService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public StudentResponse toggleStudentStatus(Integer studentId) {
 
         User student = userRepository.findById(studentId)

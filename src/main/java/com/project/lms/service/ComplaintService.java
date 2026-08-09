@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.lms.dto.ComplaintRequest;
 import com.project.lms.dto.ComplaintResponse;
@@ -38,6 +39,7 @@ public class ComplaintService {
      * =====================================
      */
 
+    @Transactional
     public ComplaintResponse createComplaint(ComplaintRequest request) {
 
         User currentUser = resolveCurrentUser();
@@ -66,10 +68,12 @@ public class ComplaintService {
      * =====================================
      */
 
+    @Transactional(readOnly = true)
     public List<ComplaintResponse> getAllComplaints() {
         return getAllComplaints(null, null);
     }
 
+    @Transactional(readOnly = true)
     public List<ComplaintResponse> getAllComplaints(
             String search,
             ComplaintStatus status) {
@@ -99,6 +103,7 @@ public class ComplaintService {
      * =====================================
      */
 
+    @Transactional(readOnly = true)
     public List<ComplaintResponse> getMyComplaints() {
 
         User currentUser = resolveCurrentUser();
@@ -116,6 +121,7 @@ public class ComplaintService {
      * =====================================
      */
 
+    @Transactional(readOnly = true)
     public ComplaintResponse getComplaintById(Integer complaintId) {
 
         Complaint complaint = complaintRepository.findById(complaintId)
@@ -141,6 +147,7 @@ public class ComplaintService {
      * =====================================
      */
 
+    @Transactional(readOnly = true)
     public List<ComplaintResponse> getComplaintsByStatus(
             ComplaintStatus status) {
 
@@ -163,6 +170,7 @@ public class ComplaintService {
      * =====================================
      */
 
+    @Transactional
     public ComplaintResponse updateStatus(
             Integer complaintId,
             ComplaintStatus status) {

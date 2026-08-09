@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.lms.dto.FeedbackRequest;
 import com.project.lms.dto.FeedbackResponse;
@@ -27,6 +28,7 @@ public class FeedbackService {
     }
 
     // Add Feedback
+    @Transactional
     public FeedbackResponse addFeedback(FeedbackRequest request) {
 
         User user = userRepository.findById(request.getUserId())
@@ -45,10 +47,12 @@ public class FeedbackService {
     }
 
     // Get All Feedback
+    @Transactional(readOnly = true)
     public List<FeedbackResponse> getAllFeedback() {
         return getAllFeedback(null, null);
     }
 
+    @Transactional(readOnly = true)
     public List<FeedbackResponse> getAllFeedback(
             String search,
             Integer rating) {
@@ -66,6 +70,7 @@ public class FeedbackService {
     }
 
     // Get Feedback By ID
+    @Transactional(readOnly = true)
     public FeedbackResponse getFeedbackById(Integer id) {
 
         Feedback feedback = feedbackRepository.findById(id)
@@ -76,6 +81,7 @@ public class FeedbackService {
     }
 
     // Get Feedback By User
+    @Transactional(readOnly = true)
     public List<FeedbackResponse> getFeedbackByUser(Integer userId) {
 
         return feedbackRepository.findByUser_Id(userId)
@@ -85,6 +91,7 @@ public class FeedbackService {
     }
 
     // Get Feedback By Rating
+    @Transactional(readOnly = true)
     public List<FeedbackResponse> getFeedbackByRating(Integer rating) {
 
         return feedbackRepository.findByRating(rating)

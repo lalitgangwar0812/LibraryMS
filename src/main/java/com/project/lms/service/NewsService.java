@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.lms.dto.NewsRequest;
 import com.project.lms.dto.NewsResponse;
@@ -33,6 +34,7 @@ public class NewsService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public NewsResponse createNews(NewsRequest request) {
         User author = resolveCurrentUser();
 
@@ -51,6 +53,7 @@ public class NewsService {
         return mapToResponse(savedNews);
     }
 
+    @Transactional
     public NewsResponse updateNews(Integer newsId, NewsRequest request) {
         User author = resolveCurrentUser();
 
@@ -79,6 +82,7 @@ public class NewsService {
         newsRepository.delete(news);
     }
 
+    @Transactional(readOnly = true)
     public List<NewsResponse> getAllNews() {
         return newsRepository.findByPublishedTrueOrderByCreatedAtDesc(PageRequest.of(0, 20)).getContent()
                 .stream()
@@ -86,6 +90,7 @@ public class NewsService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public NewsResponse getNewsById(Integer newsId) {
         News news = newsRepository.findById(newsId)
                 .orElseThrow(() -> new ResourceNotFoundException("News not found"));
@@ -100,6 +105,7 @@ public class NewsService {
         return mapToResponse(news);
     }
 
+    @Transactional(readOnly = true)
     public List<NewsResponse> getNewsByUser(Integer userId) {
         return newsRepository.findByPostedBy_Id(userId)
                 .stream()
@@ -107,6 +113,7 @@ public class NewsService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<NewsResponse> searchByTitle(String title) {
         return newsRepository.findByTitleContainingIgnoreCaseAndPublishedTrue(title, PageRequest.of(0, 50)).getContent()
                 .stream()
@@ -114,6 +121,7 @@ public class NewsService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<NewsResponse> getAdminNews(String search, int page, int size) {
         Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1));
         Page<News> result;

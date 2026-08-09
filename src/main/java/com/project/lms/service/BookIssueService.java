@@ -159,6 +159,7 @@ public class BookIssueService {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
+    @Transactional(readOnly = true)
     public StudentResponse getStudentForCirculation(Integer studentId) {
         User student = userRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
@@ -186,6 +187,7 @@ public class BookIssueService {
     }
 
     // Get Issue By ID
+    @Transactional(readOnly = true)
     public BookIssueResponse getIssueById(Integer id) {
 
         BookIssue issue = bookIssueRepository.findById(id)
@@ -196,6 +198,7 @@ public class BookIssueService {
     }
 
     // Get Issues By User
+    @Transactional(readOnly = true)
     public List<BookIssueResponse> getIssuesByUser(Integer userId) {
 
         return bookIssueRepository.findByUser_Id(userId)
@@ -204,6 +207,7 @@ public class BookIssueService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<BookIssueResponse> getIssuesForCurrentUser() {
 
         User currentUser = resolveCurrentUser();
@@ -219,6 +223,7 @@ public class BookIssueService {
     }
 
     // Get Issues By Book
+    @Transactional(readOnly = true)
     public List<BookIssueResponse> getIssuesByBook(Integer bookId) {
 
         return bookIssueRepository.findByBook_BookId(bookId)

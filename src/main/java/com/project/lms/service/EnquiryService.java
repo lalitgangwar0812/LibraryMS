@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.project.lms.dto.EnquiryRequest;
 import com.project.lms.dto.EnquiryResponse;
@@ -28,6 +29,7 @@ public class EnquiryService {
     }
 
     // Create Enquiry
+    @Transactional
     public EnquiryResponse createEnquiry(EnquiryRequest request) {
 
         User user = userRepository.findById(request.getUserId())
@@ -47,6 +49,7 @@ public class EnquiryService {
     }
 
     // Get All Enquiries
+    @Transactional(readOnly = true)
     public List<EnquiryResponse> getAllEnquiries() {
 
         return enquiryRepository.findAllByOrderByCreatedAtDesc()
@@ -56,6 +59,7 @@ public class EnquiryService {
     }
 
     // Get Enquiry By ID
+    @Transactional(readOnly = true)
     public EnquiryResponse getEnquiryById(Integer enquiryId) {
 
         Enquiry enquiry = enquiryRepository.findById(enquiryId)
@@ -66,6 +70,7 @@ public class EnquiryService {
     }
 
     // Get Enquiries By User
+    @Transactional(readOnly = true)
     public List<EnquiryResponse> getEnquiriesByUser(Integer userId) {
 
         return enquiryRepository.findByUser_Id(userId)
@@ -75,6 +80,7 @@ public class EnquiryService {
     }
 
     // Get Enquiries By Status
+    @Transactional(readOnly = true)
     public List<EnquiryResponse> getEnquiriesByStatus(EnquiryStatus status) {
 
         return enquiryRepository.findByStatus(status)
@@ -84,6 +90,7 @@ public class EnquiryService {
     }
 
     // Update Status
+    @Transactional
     public EnquiryResponse updateStatus(
             Integer enquiryId,
             EnquiryStatus status) {
