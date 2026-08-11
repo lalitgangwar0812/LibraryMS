@@ -97,43 +97,43 @@ function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-white">
       <AuthHeader />
       <main className="relative overflow-hidden px-5 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12">
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:48px_48px]" />
         <div className="relative mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
-          <section className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xl shadow-slate-950/5 sm:p-9">
-            <div className="inline-flex rounded-xl bg-sky-50 p-3 text-sky-600">
+          <section className="rounded-3xl border border-slate-200 bg-slate-950 p-7 text-white shadow-xl shadow-slate-950/10 sm:p-9">
+            <div className="inline-flex rounded-xl bg-white/10 p-3 text-sky-300">
               <BookOpen size={22} />
             </div>
-            <h1 className="mt-6 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Create your student account</h1>
-            <p className="mt-4 max-w-md text-base leading-7 text-slate-600">Join the library community and start accessing books, updates, and learning resources.</p>
+            <h1 className="mt-6 text-3xl font-semibold tracking-tight sm:text-4xl">Create your student account</h1>
+            <p className="mt-4 max-w-md text-base leading-7 text-slate-300">Join the library community and start accessing books, updates, and learning resources.</p>
 
-            <div className="mt-10 rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+            <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-slate-900">Library Preview</p>
-                <span className="inline-flex items-center rounded-full bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">LIVE</span>
+                <p className="text-sm font-semibold text-white">Library Preview</p>
+                <span className="inline-flex items-center rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">LIVE</span>
               </div>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl border border-slate-200 bg-white p-3 text-center">
-                  <p className="text-sm font-semibold text-slate-900">12.4k</p>
-                  <p className="mt-1 text-xs text-slate-500">Books</p>
+                <div className="rounded-xl bg-white/10 p-3 text-center">
+                  <p className="text-sm font-semibold text-white">12.4k</p>
+                  <p className="mt-1 text-xs text-slate-400">Books</p>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-3 text-center">
-                  <p className="text-sm font-semibold text-slate-900">248</p>
-                  <p className="mt-1 text-xs text-slate-500">Active Loans</p>
+                <div className="rounded-xl bg-white/10 p-3 text-center">
+                  <p className="text-sm font-semibold text-white">248</p>
+                  <p className="mt-1 text-xs text-slate-400">Active Loans</p>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-3 text-center">
-                  <p className="text-sm font-semibold text-slate-900">18</p>
-                  <p className="mt-1 text-xs text-slate-500">Announcements</p>
+                <div className="rounded-xl bg-white/10 p-3 text-center">
+                  <p className="text-sm font-semibold text-white">18</p>
+                  <p className="mt-1 text-xs text-slate-400">Announcements</p>
                 </div>
               </div>
 
-              <ul className="mt-5 space-y-2 text-sm text-slate-600">
+              <ul className="mt-5 space-y-2 text-sm text-slate-300">
                 {['Browse books', 'Borrow & return books', 'Read announcements', 'Submit feedback'].map((item) => (
-                  <li key={item} className="flex items-center gap-2">
-                    <Check size={14} className="shrink-0 text-sky-600" />
+                  <li key={item} className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2">
+                    <Check size={14} className="shrink-0 text-sky-300" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -141,12 +141,12 @@ function RegisterPage() {
             </div>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="flex min-h-[84px] items-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm">
-                <ShieldCheck size={18} className="text-sky-600" />
+              <div className="flex min-h-[84px] items-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+                <ShieldCheck size={18} className="text-sky-300" />
                 <span className="ml-3">JWT Authentication</span>
               </div>
-              <div className="flex min-h-[84px] items-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm">
-                <BookOpen size={18} className="text-sky-600" />
+              <div className="flex min-h-[84px] items-center rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300">
+                <BookOpen size={18} className="text-sky-300" />
                 <span className="ml-3">Access Anywhere</span>
               </div>
             </div>
@@ -154,7 +154,7 @@ function RegisterPage() {
 
           <section className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xl shadow-slate-950/5 sm:p-9">
             <h2 className="text-2xl font-semibold text-slate-900">Create Account</h2>
-            <p className="mt-2 text-sm text-slate-600">Register as a student to continue.</p>
+            <p className="mt-2 text-sm text-slate-300">Register as a student to continue.</p>
 
             <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
               <div>
